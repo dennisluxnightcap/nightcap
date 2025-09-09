@@ -1,0 +1,24 @@
+{
+  "summary": [
+    { "title": "Scientists discovered a new coral reef system off Ecuador", "url": "#" },
+    { "title": "Global renewable energy capacity jumped 15% this year", "url": "#" },
+    { "title": "Community libraries report record volunteer sign-ups", "url": "#" },
+    { "title": "New battery breakthrough promises faster charging", "url": "#" },
+    { "title": "Orcas return to a restored coastal habitat", "url": "#" }
+  ],
+  "feelGood": [
+    "Two minutes of slow breathing can measurably lower stress.",
+    "Hearing birdsong is linked to lower anxiety scores.",
+    "Texting a friend you appreciate boosts both your moods."
+  ],
+  "learn": [
+    "Honey never spoils — jars from ancient Egypt were still edible.",
+    "Octopuses have three hearts and blue blood.",
+    "Bananas are berries; strawberries aren’t."
+  ],
+  "breath": [
+    { "pattern": [4, 4, 4], "label": "Box (4-4-4)" },
+    { "pattern": [4, 7, 8], "label": "4-7-8" },
+    { "pattern": [5, 5], "label": "Resonance (5-5)" }
+  ]
+}

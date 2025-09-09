@@ -1,0 +1,456 @@
+/* ===============================
+   THEME TOKENS & RESET
+   =============================== */
+:root {
+  --bg: #0b132b;
+  --card: #111a34;
+  --text: #e7ecff;
+  --muted: #a9b3d6;
+  --accent: #5ce1e6;
+  --shadow: 0 8px 28px rgba(0, 0, 0, .35);
+}
+
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; }
+
+body {
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* ===============================
+   LAYOUT WRAPPERS
+   =============================== */
+.shell {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 8px 0 16px;
+}
+
+.top h1 {
+  font-size: 22px;
+  margin: 0;
+  letter-spacing: .5px;
+}
+
+.pill {
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .08);
+  color: var(--muted);
+}
+
+/* ===============================
+   GENERIC CARD
+   =============================== */
+.card {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+  margin-bottom: 12px;
+}
+
+.card h2 {
+  margin: 0 0 8px;
+  font-size: 18px;
+}
+
+.card-body p {
+  line-height: 1.5;
+  color: var(--text);
+}
+
+/* ===============================
+   BUTTONS
+   =============================== */
+.btn {
+  appearance: none;
+  border: 0;
+  background: var(--accent);
+  color: #042c2e;
+  font-weight: 700;
+  padding: 10px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform .12s ease, box-shadow .12s ease, opacity .2s ease;
+}
+
+.btn:active { transform: translateY(1px); }
+.btn:hover { box-shadow: 0 8px 24px rgba(92, 225, 230, .26); }
+.btn[disabled] { opacity: .6; cursor: not-allowed; }
+
+/* ===============================
+   FOOTER
+   =============================== */
+.foot {
+  margin-top: 18px;
+  text-align: center;
+  color: var(--muted);
+}
+
+/* ===============================
+   BREATHING EXERCISE
+   =============================== */
+.breathing {
+  display: grid;
+  place-items: center;
+  gap: 8px;
+  padding: 10px 0 4px;
+}
+
+.orb {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(92, 225, 230, .9), rgba(92, 225, 230, .25));
+  transition: transform .9s ease, opacity .9s ease;
+  box-shadow: 0 12px 50px rgba(92, 225, 230, .25);
+}
+
+.breathing-label { font-weight: 700; letter-spacing: .4px; }
+.breathing-count, .breathing-round, .breathing-script { color: var(--muted); }
+.breathing-script { text-align: center; max-width: 420px; }
+
+@media (max-width: 420px) {
+  .orb { width: 110px; height: 110px; }
+}
+
+/* ===============================
+   DAILY SUMMARY (FIRST CARD)
+   =============================== */
+.section-title {
+  color: var(--muted);
+  font-weight: 600;
+  text-align: center;
+  margin: 6px 0 12px;
+  letter-spacing: .2px;
+}
+
+/* Daily Summary list layout — unified */
+.facts {
+  display: grid;
+  gap: 18px;              /* more breathing room */
+  max-width: 640px;       /* calmer line length */
+  margin: 0 auto;         /* center horizontally */
+  padding-top: 8px;       /* space from header */
+}
+
+
+.fact-card {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 16px 18px;
+  box-shadow: var(--shadow);
+  display: grid;
+  grid-template-columns: 40px 1fr; /* space for icon chip */
+  align-items: start;
+  gap: 12px;
+  border: 1px solid rgba(255, 255, 255, .06);
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+
+.fact-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, .38);
+}
+
+.fact-card .icon {
+  font-size: 1.1rem;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .06);
+  border: 1px solid rgba(255, 255, 255, .10);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06);
+  margin-top: 2px; /* align to first text line */
+}
+
+/* Emoji tint accents */
+.icon.blue  { color: #4da6ff; }  /* 🌍 */
+.icon.green { color: #4caf50; }  /* 📈 */
+.icon.pink  { color: #ff5fa2; }  /* ❤️ */
+
+.fact-card p {
+  margin: 0;
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
+@media (max-width: 420px) {
+  .fact-card {
+    grid-template-columns: 32px 1fr;
+    padding: 14px 16px;
+  }
+  .fact-card .icon {
+    width: 26px;
+    height: 26px;
+    font-size: 1rem;
+  }
+}
+
+/* ===============================
+   FEEL-GOOD / LEARN BUBBLE CARD
+   =============================== */
+.section-hero {
+  text-align: center;
+  margin: 10px 0 6px;
+}
+
+.section-hero .badge {
+  display: inline-grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 8px;
+  border-radius: 999px;
+  background: radial-gradient(120% 120% at 30% 20%, #ff8bd9 0%, #7a3cff 60%, #271a49 100%);
+  box-shadow: 0 10px 28px rgba(122, 60, 255, .35);
+  border: 1px solid rgba(255, 255, 255, .12);
+  color: #ffd6f2;
+  font-size: 1.2rem;
+}
+
+.section-hero .title {
+  font-weight: 200;
+  font-size: clamp(40px, 6.5vw, 64px);
+  line-height: 1.05;
+  color: var(--text);
+  margin: 0;
+}
+
+.section-hero .accent {
+  display: block;
+  font-weight: 400;
+  background: linear-gradient(90deg, #ff8bd9, #b38bff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.bubble-card {
+  margin: 16px auto 0;
+  padding: clamp(16px, 3vw, 22px) clamp(18px, 4vw, 26px);
+  max-width: 780px;
+  border-radius: 22px;
+  background:
+    radial-gradient(120% 120% at 0% 0%, rgba(255, 139, 217, .16), transparent 60%),
+    radial-gradient(120% 120% at 100% 100%, rgba(122, 60, 255, .22), transparent 60%),
+    linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .02));
+  border: 1px solid rgba(186, 153, 255, .20);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .38), inset 0 1px 0 rgba(255, 255, 255, .08);
+}
+
+.bubble-card p {
+  margin: 0;
+  font-size: clamp(18px, 2.6vw, 22px);
+  line-height: 1.6;
+  text-align: center;
+  color: var(--text);
+  text-wrap: pretty;
+}
+
+/* ===== Nightcap gradient system ===== */
+:root {
+  --grad-a: #8bd3ff;
+  --grad-b: #b38bff;
+  --grad-c: #ff8bd9;
+  --glass: rgba(255,255,255,.06);
+  --glass-border: rgba(255,255,255,.14);
+}
+
+/* ===== Summary hero (badge + gradient headline) ===== */
+.summary-hero .badge {
+  display: inline-grid;
+  place-items: center;
+  width: 56px; height: 56px;
+  margin: 8px 0 10px;
+  border-radius: 999px;
+  background:
+    radial-gradient(120% 120% at 30% 20%, #ffb347 0%, #ff7e5f 60%, #332019 100%);
+  box-shadow: 0 12px 30px rgba(255,126,95,.35);
+  border: 1px solid rgba(255,255,255,.15);
+  color: #fff3e0;
+  font-size: 1.25rem;
+}
+
+.summary-hero .title {
+  font-weight: 300;
+  font-size: clamp(36px, 6.2vw, 64px);
+  line-height: 1.1;
+  margin: 0;
+  text-align: center;
+  color: rgba(231,236,255,.92); /* softer white */
+}
+
+
+.summary-hero .accent {
+  background: linear-gradient(90deg, #ffb347, #ff7e5f);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-weight: 400;
+}
+
+/* Hide subtitle */
+.summary-hero .subtitle {
+  display: none;
+}
+
+
+/* ===== Bubble wrap around the stack ===== */
+.summary-bubble {
+  margin: 18px auto 0;
+  padding: clamp(14px, 2.6vw, 20px);
+  border-radius: 22px;
+  max-width: 760px;
+  background:
+    radial-gradient(120% 120% at 0% 0%, rgba(139, 211, 255, .10), transparent 60%),
+    radial-gradient(120% 120% at 100% 100%, rgba(179, 139, 255, .16), transparent 60%),
+    linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+  border: 1px solid rgba(179,139,255,.24);
+  box-shadow: 0 10px 30px rgba(0,0,0,.38), inset 0 1px 0 rgba(255,255,255,.06);
+}
+
+
+
+/* ===== Glowy, tactile fact cards ===== */
+.fact-card.glow {
+  position: relative;
+  padding: 16px 20px;
+  grid-template-columns: 36px 1fr;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,.08);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+  box-shadow:
+    0 6px 22px rgba(0,0,0,.32),
+    inset 0 1px 0 rgba(255,255,255,.06);
+  transition: transform .14s ease, box-shadow .14s ease, border-color .14s ease;
+  overflow: hidden;
+}
+
+.fact-card.glow::before {
+  /* left gradient accent wash */
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, rgba(92,225,230,.32), transparent 28%);
+  opacity: .18;
+  pointer-events: none;
+}
+
+.fact-card.glow:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 30px rgba(0,0,0,.38), inset 0 1px 0 rgba(255,255,255,.06);
+  border-color: rgba(92,225,230,.28);
+}
+
+.fact-card .icon {
+  width: 26px; height: 26px; font-size: 1rem;
+  display: grid; place-items: center;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  margin-top: 3px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+}
+
+.fact-card p {
+  margin: 0;
+  line-height: 1.6;
+  font-size: 1.02rem;
+  text-wrap: pretty;
+}
+
+/* Emoji tints (keep from earlier) */
+.icon.blue  { color: #4da6ff; }
+.icon.green { color: #4caf50; }
+.icon.pink  { color: #ff5fa2; }
+
+/* Mobile tuning */
+@media (max-width: 420px) {
+  .summary-hero .title { font-size: clamp(32px, 9vw, 44px); }
+  .summary-bubble { padding: 14px; }
+  .fact-card.glow { grid-template-columns: 32px 1fr; padding: 14px 16px; }
+  .fact-card .icon { width: 24px; height: 24px; font-size: .95rem; }
+}
+
+/* --- Colorful variants for fact cards --- */
+.fact-card.glow {
+  position: relative;
+  padding: 16px 20px;
+  grid-template-columns: 36px 1fr;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,.08);
+  box-shadow: 0 6px 22px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.06);
+  transition: transform .14s ease, box-shadow .14s ease, border-color .14s ease;
+  overflow: hidden;
+}
+
+/* Unique gradient washes per card */
+.fact-card.variant-0 {
+  background: linear-gradient(135deg, rgba(255,180,80,.15), rgba(255,140,0,.08));
+  border-color: rgba(255,180,80,.3);
+}
+.fact-card.variant-1 {
+  background: linear-gradient(135deg, rgba(80,200,255,.15), rgba(0,150,255,.08));
+  border-color: rgba(80,200,255,.3);
+}
+.fact-card.variant-2 {
+  background: linear-gradient(135deg, rgba(255,80,140,.15), rgba(200,0,80,.08));
+  border-color: rgba(255,80,140,.3);
+}
+
+.fact-card.glow:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(0,0,0,.38), inset 0 1px 0 rgba(255,255,255,.06);
+}
+
+.summary-hero {
+  margin-bottom: 32px; /* adds clean spacing below the big header */
+}
+
+/* Softer main title so 'today' pops */
+.summary-hero .title {
+  font-weight: 300;
+  color: rgba(231,236,255,.92);
+  line-height: 1.1;
+}
+
+/* Subtle hover/press */
+.fact-card.glow:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 34px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.08);
+}
+.fact-card.glow:active {
+  transform: translateY(0);
+  box-shadow: 0 6px 20px rgba(0,0,0,.3);
+}
+
+/* (Optional) tiny fade-in */
+.facts .fact-card {
+  opacity: 0;
+  transform: translateY(8px);
+  animation: fadeUp .5s ease forwards;
+}
+.facts .fact-card:nth-child(1) { animation-delay: .05s; }
+.facts .fact-card:nth-child(2) { animation-delay: .15s; }
+.facts .fact-card:nth-child(3) { animation-delay: .25s; }
+
+@keyframes fadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}
