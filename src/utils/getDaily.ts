@@ -1,4 +1,5 @@
 import type { Daily } from "@/types";
+import { getStaticContent } from "./getStatic";
 
 async function tryJson(path: string) {
   try {
@@ -10,16 +11,17 @@ async function tryJson(path: string) {
   }
 }
 
-export async function getDaily(): Promise<Daily> {
-  // Always read default.json
+export async function getDaily(d: Date = new Date()): Promise<Daily> {
   const daily = await tryJson(`/content/daily/default.json`);
-  if (daily) return daily as Daily;
+  const staticContent = getStaticContent(d);
 
-  // Fallback if file missing
   return {
-    summary: [],
-    feelGood: "",
-    learn: "",
-    breathing: { pattern: "4-7-8", rounds: 3 }
-  } as Daily;
+    // ✅ summary still comes from default.json if it exists
+    summary: daily?.summary ?? [],
+
+    // ✅ these rotate daily from your lists
+    feelGood: staticContent.feelGood,
+    learn: staticContent.learn,
+    breathing: staticContent.breathing
+  };
 }

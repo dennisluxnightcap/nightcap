@@ -6,6 +6,7 @@ import Card from "./components/Card";
 import Breathing from "./components/Breathing";
 import FeelGoodFact from "./components/FeelGoodFact";
 import LearnFact from "./components/LearnFact";
+import { motion, AnimatePresence } from "framer-motion";
 
 const steps = ["Summary", "Feel-good", "Learn", "Breathe"] as const;
 type Step = (typeof steps)[number];
@@ -31,31 +32,42 @@ export default function App() {
         <div className="pill">~ 1 minute</div>
       </header>
 
-      {step === "Summary" && (
-        <div>
-          <DailySummary />
-          <div style={{ marginTop: 16 }}>
-            <button className="btn" onClick={next}>Next</button>
-          </div>
-        </div>
-      )}
+      {/* 👇 Animate step changes */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={step}
+          initial={{ opacity: 0, x: 40 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -40 }}
+          transition={{ duration: 0.5 }}
+        >
+          {step === "Summary" && (
+            <div>
+              <DailySummary items={daily.summary} />
+              <div style={{ marginTop: 16 }}>
+                <button className="btn" onClick={next}>Next</button>
+              </div>
+            </div>
+          )}
 
-      {step === "Feel-good" && (
-        <FeelGoodFact text={daily.feelGood} onNext={next} />
-      )}
+          {step === "Feel-good" && (
+            <FeelGoodFact text={daily.feelGood} onNext={next} />
+          )}
 
-      {step === "Learn" && (
-        <LearnFact text={daily.learn} onNext={next} />
-      )}
+          {step === "Learn" && (
+            <LearnFact text={daily.learn} onNext={next} />
+          )}
 
-      {step === "Breathe" && (
-        <Card title="Breathing">
-          <Breathing {...daily.breathing} />
-          <div className="row" style={{ marginTop: 12 }}>
-            <button className="btn" onClick={restart}>Restart</button>
-          </div>
-        </Card>
-      )}
+          {step === "Breathe" && (
+            <Card title="Breathing">
+              <Breathing {...daily.breathing} />
+              <div className="row" style={{ marginTop: 12 }}>
+                <button className="btn" onClick={restart}>Restart</button>
+              </div>
+            </Card>
+          )}
+        </motion.div>
+      </AnimatePresence>
 
       <footer className="foot">
         <small>

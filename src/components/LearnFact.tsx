@@ -5,7 +5,7 @@ export default function LearnFact({
   onNext,
 }: { text: string; onNext: () => void }) {
   return (
-    <section>
+    <section className="learn">
       <div className="section-hero">
         <div className="badge">🧠</div>
         <h2 className="title">

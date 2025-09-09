@@ -454,3 +454,39 @@ body {
 @keyframes fadeUp {
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* === Learn (Wisdom/Gold) theme — scoped so other sections stay unchanged === */
+.learn {
+  --learn-gold-1: #ffe08a;   /* light */
+  --learn-gold-2: #d4af37;   /* classic gold */
+  --learn-gold-3: #3a2a10;   /* deep shadow */
+  --learn-border: rgba(212, 175, 55, .28);
+  --learn-wash-a: rgba(255, 224, 138, .16);
+  --learn-wash-b: rgba(212, 175, 55, .22);
+}
+
+/* Badge glow */
+.learn .section-hero .badge {
+  background: radial-gradient(120% 120% at 30% 20%, var(--learn-gold-1) 0%, var(--learn-gold-2) 60%, var(--learn-gold-3) 100%);
+  box-shadow: 0 10px 28px rgba(212, 175, 55, .35);
+  border: 1px solid rgba(255,255,255,.12);
+  color: #fff7e6;
+}
+
+/* Headline accent gradient */
+.learn .section-hero .accent {
+  background: linear-gradient(90deg, var(--learn-gold-1), var(--learn-gold-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Bubble card with warm gold wash */
+.learn .bubble-card {
+  background:
+    radial-gradient(120% 120% at 0% 0%, var(--learn-wash-a), transparent 60%),
+    radial-gradient(120% 120% at 100% 100%, var(--learn-wash-b), transparent 60%),
+    linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .02));
+  border: 1px solid var(--learn-border);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .38), inset 0 1px 0 rgba(255, 255, 255, .08);
+}
