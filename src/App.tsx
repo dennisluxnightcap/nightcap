@@ -6,9 +6,10 @@ import Card from "./components/Card";
 import Breathing from "./components/Breathing";
 import FeelGoodFact from "./components/FeelGoodFact";
 import LearnFact from "./components/LearnFact";
+import Story from "./components/Story";
 import { motion, AnimatePresence } from "framer-motion";
 
-const steps = ["Summary", "Feel-good", "Learn", "Breathe"] as const;
+const steps = ["Summary", "Feel-good", "Learn", "Story", "Breathe"] as const;
 type Step = (typeof steps)[number];
 
 export default function App() {
@@ -23,19 +24,21 @@ export default function App() {
   if (!daily) return <div className="shell">Loading…</div>;
 
   const next = () => setStepIndex((i) => Math.min(i + 1, steps.length - 1));
+  const prev = () => setStepIndex((i) => Math.max(i - 1, 0));
   const restart = () => setStepIndex(0);
+
+  // helper to only pass prev when we're past the first step
+  const maybePrev = stepIndex > 0 ? prev : undefined;
 
   return (
     <main className="shell">
-      <header className="top">
-        <h1>Nightcap</h1>
-        <div className="pill">~ 1 minute</div>
-      </header>
+      <header className="top"></header>
 
       {/* 👇 Animate step changes */}
       <AnimatePresence mode="wait">
         <motion.div
           key={step}
+          className="motion-page"
           initial={{ opacity: 0, x: 40 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -40 }}
@@ -44,37 +47,58 @@ export default function App() {
           {step === "Summary" && (
             <div>
               <DailySummary items={daily.summary} />
+              {/* SVG arrow nav for summary (left hidden on first card) */}
               <div style={{ marginTop: 16 }}>
-                <button className="btn" onClick={next}>Next</button>
+                <nav className="nav-buttons" aria-label="Card navigation" style={{ justifyContent: "center" }}>
+
+                  
+
+                  <button className="nav-btn primary pulse" onClick={next} aria-label="Next" title="Next">
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+    <path d="M8 5l8 7-8 7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+</button>
+
+                </nav>
               </div>
             </div>
           )}
 
           {step === "Feel-good" && (
-            <FeelGoodFact text={daily.feelGood} onNext={next} />
+            <FeelGoodFact text={daily.feelGood} onNext={next} onPrev={maybePrev} />
           )}
 
           {step === "Learn" && (
-            <LearnFact text={daily.learn} onNext={next} />
+            <LearnFact text={daily.learn} onNext={next} onPrev={maybePrev} />
+          )}
+
+          {step === "Story" && daily && (
+            <Story text={daily.story} onNext={next} onPrev={maybePrev} />
           )}
 
           {step === "Breathe" && (
-            <Card title="Breathing">
-              <Breathing {...daily.breathing} />
-              <div className="row" style={{ marginTop: 12 }}>
-                <button className="btn" onClick={restart}>Restart</button>
-              </div>
-            </Card>
-          )}
+  <Card>   {/* ← removed title="Breathing" */}
+    <Breathing {...daily.breathing} />
+    <div className="row" style={{ marginTop: 12 }}>
+      <nav className="nav-buttons" aria-label="Breathing navigation">
+        <button className="nav-btn primary" onClick={prev} aria-label="Back" title="Back">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+            <path d="M16 19L8 12l8-7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </button>
+        <button className="nav-btn primary" onClick={restart} aria-label="Restart" title="Restart">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+            <path d="M21 12a9 9 0 1 0-3.4 6.8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M21 3v6h-6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </button>
+      </nav>
+    </div>
+  </Card>
+)}
+
         </motion.div>
       </AnimatePresence>
-
-      <footer className="foot">
-        <small>
-          <a href="mailto:feedback@nightcap.example">Feedback</a> •{" "}
-          <a href="/privacy">Privacy</a>
-        </small>
-      </footer>
     </main>
   );
 }

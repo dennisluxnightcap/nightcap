@@ -1,5 +1,7 @@
 import type { Breathing } from "@/types";
+import { stories } from "./storyPool";
 
+// Helper: stable daily index
 function localISO(d: Date = new Date()) {
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, "0");
@@ -22,7 +24,7 @@ function pickByDate<T>(arr: T[], date: Date = new Date()): T {
   return arr[idx];
 }
 
-/** You can expand these lists anytime */
+/** Fact pools */
 const FEELGOOD: string[] = [
   "Sea otters hold hands while they sleep so they don’t drift apart.",
   "Penguins propose with pebbles.",
@@ -52,10 +54,12 @@ const BREATHING: Breathing[] = [
   { pattern: "6-2-6", rounds: 4, script: "Inhale 6, hold 2, exhale 6. Relax your shoulders." }
 ];
 
+/** Final export */
 export function getStaticContent(date: Date = new Date()) {
   return {
     feelGood: pickByDate(FEELGOOD, date),
     learn: pickByDate(LEARN, date),
-    breathing: pickByDate(BREATHING, date)
+    story: pickByDate(stories, date),    // 👈 pulls from storyPool.ts
+    breathing: pickByDate(BREATHING, date),
   };
 }

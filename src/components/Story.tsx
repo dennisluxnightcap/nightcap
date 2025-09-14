@@ -1,42 +1,31 @@
-import React from "react";
+import { BookOpen } from "lucide-react";
 import { motion } from "framer-motion";
 
-export default function LearnFact({
+export default function Story({
   text,
   onNext,
   onPrev,
 }: { text: string; onNext: () => void; onPrev?: () => void }) {
   return (
-    <section className="learn">
+    <section className="story-section">
       <div className="section-hero">
-        <div className="badge">
-  {/* Lightbulb icon for learning */}
-  <svg viewBox="0 0 24 24" fill="none" aria-hidden>
-    <path
-      d="M9 18h6m-5 3h4M12 2a7 7 0 0 0-4 12.9V17h8v-2.1A7 7 0 0 0 12 2Z"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-</div>
-
+        <div className="badge story-badge">
+          <BookOpen size={28} strokeWidth={2.5} />
+        </div>
         <h2 className="title">
-          Learn
-          <span className="accent">Something New</span>
+          Short <span className="accent story-accent">Story</span>
         </h2>
       </div>
 
       <div className="bubble-card">
-       <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 2.5, ease: "easeOut", delay: 0.3 }}
-      >
-        {text}
-      </motion.p>
-      </div>
+ <motion.p
+  initial={{ opacity: 0 }}
+  animate={{ opacity: 1 }}
+  transition={{ duration: 2.5, ease: "easeOut", delay: 0.3 }}
+>
+  {text}
+</motion.p>
+</div>
 
       <div style={{ marginTop: 16 }}>
         <nav className="nav-buttons" aria-label="Card navigation">

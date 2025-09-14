@@ -8,6 +8,13 @@
   --muted: #a9b3d6;
   --accent: #5ce1e6;
   --shadow: 0 8px 28px rgba(0, 0, 0, .35);
+
+  /* Nightcap gradient system */
+  --grad-a: #8bd3ff;
+  --grad-b: #b38bff;
+  --grad-c: #ff8bd9;
+  --glass: rgba(255,255,255,.06);
+  --glass-border: rgba(255,255,255,.14);
 }
 
 * { box-sizing: border-box; }
@@ -85,7 +92,6 @@ body {
   cursor: pointer;
   transition: transform .12s ease, box-shadow .12s ease, opacity .2s ease;
 }
-
 .btn:active { transform: translateY(1px); }
 .btn:hover { box-shadow: 0 8px 24px rgba(92, 225, 230, .26); }
 .btn[disabled] { opacity: .6; cursor: not-allowed; }
@@ -140,24 +146,25 @@ body {
 /* Daily Summary list layout — unified */
 .facts {
   display: grid;
-  gap: 18px;              /* more breathing room */
-  max-width: 640px;       /* calmer line length */
-  margin: 0 auto;         /* center horizontally */
-  padding-top: 8px;       /* space from header */
+  gap: 18px;
+  max-width: 640px;
+  margin: 0 auto;
+  padding-top: 8px;
 }
 
-
+/* --- Icon/Thumb sizing for bigger thumbnails --- */
 .fact-card {
   background: var(--card);
   border-radius: 16px;
   padding: 16px 18px;
   box-shadow: var(--shadow);
   display: grid;
-  grid-template-columns: 40px 1fr; /* space for icon chip */
-  align-items: start;
+  grid-template-columns: 60px 1fr; /* widened to fit bigger thumb */
+  align-items: center;
   gap: 12px;
   border: 1px solid rgba(255, 255, 255, .06);
   transition: transform .12s ease, box-shadow .12s ease;
+  position: relative; /* for mini-toggle positioning */
 }
 
 .fact-card:hover {
@@ -165,39 +172,52 @@ body {
   box-shadow: 0 10px 32px rgba(0, 0, 0, .38);
 }
 
+/* Icon container sized to host the larger circular thumb */
 .fact-card .icon {
-  font-size: 1.1rem;
   display: grid;
   place-items: center;
-  width: 28px;
-  height: 28px;
+  width: 56px;
+  height: 56px;
   border-radius: 999px;
   background: rgba(255, 255, 255, .06);
   border: 1px solid rgba(255, 255, 255, .10);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06);
-  margin-top: 2px; /* align to first text line */
+  margin-top: 0px;
 }
 
-/* Emoji tint accents */
+/* Bigger circular thumbnail (only size/shape changed) */
+.icon .thumb {
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  object-fit: cover;
+  display: block;
+}
+
+/* Emoji tint accents (colors unchanged) */
 .icon.blue  { color: #4da6ff; }  /* 🌍 */
 .icon.green { color: #4caf50; }  /* 📈 */
 .icon.pink  { color: #ff5fa2; }  /* ❤️ */
 
 .fact-card p {
   margin: 0;
-  line-height: 1.55;
+  line-height: 1.4;
+  align-self: center;
   text-wrap: pretty;
 }
 
 @media (max-width: 420px) {
   .fact-card {
-    grid-template-columns: 32px 1fr;
+    grid-template-columns: 56px 1fr; /* keep room for thumb on small screens */
     padding: 14px 16px;
   }
   .fact-card .icon {
-    width: 26px;
-    height: 26px;
-    font-size: 1rem;
+    width: 52px;
+    height: 52px;
+  }
+  .icon .thumb {
+    width: 44px;
+    height: 44px;
   }
 }
 
@@ -241,7 +261,7 @@ body {
 }
 
 .bubble-card {
-  margin: 16px auto 0;
+  margin: 40px auto 0;
   padding: clamp(16px, 3vw, 22px) clamp(18px, 4vw, 26px);
   max-width: 780px;
   border-radius: 22px;
@@ -255,36 +275,58 @@ body {
 
 .bubble-card p {
   margin: 0;
+  font-family: "Manrope", Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
   font-size: clamp(18px, 2.6vw, 22px);
-  line-height: 1.6;
+  line-height: 1.7;
   text-align: center;
-  color: var(--text);
+  color: #ffffff; /* white fill */
   text-wrap: pretty;
+
+  /* Outline */
+  -webkit-text-stroke: 0.2px black; /* thickness + color */
+  text-shadow: 2px 3px 44px rgba(0, 0, 0, 0.9);
 }
 
-/* ===== Nightcap gradient system ===== */
-:root {
-  --grad-a: #8bd3ff;
-  --grad-b: #b38bff;
-  --grad-c: #ff8bd9;
-  --glass: rgba(255,255,255,.06);
-  --glass-border: rgba(255,255,255,.14);
+/* make the Story page use the green skin for the shared .bubble-card */
+.story-section .bubble-card {
+  position: relative; /* needed for ::before if you add highlights */
+  background: linear-gradient(
+    145deg,
+    rgba(208, 244, 222, 0.15),
+    rgba(82, 183, 136, 0.25) 40%,
+    rgba(27, 67, 50, 0.90) 100%
+  );
+  border: 1px solid rgba(64, 145, 108, 0.85);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
 }
+
+
 
 /* ===== Summary hero (badge + gradient headline) ===== */
+.summary-hero {
+  margin-bottom: 32px;
+}
+
 .summary-hero .badge {
   display: inline-grid;
   place-items: center;
-  width: 56px; height: 56px;
+  width: 56px;
+  height: 56px;
   margin: 8px 0 10px;
   border-radius: 999px;
-  background:
-    radial-gradient(120% 120% at 30% 20%, #ffb347 0%, #ff7e5f 60%, #332019 100%);
+  background: radial-gradient(120% 120% at 30% 20%, #ffb347 0%, #ff7e5f 60%, #332019 100%);
   box-shadow: 0 12px 30px rgba(255,126,95,.35);
   border: 1px solid rgba(255,255,255,.15);
   color: #fff3e0;
   font-size: 1.25rem;
 }
+
+.section-hero .badge svg {
+  width: 33px;
+  height: 53px;
+  display: block;
+}
+
 
 .summary-hero .title {
   font-weight: 300;
@@ -292,9 +334,8 @@ body {
   line-height: 1.1;
   margin: 0;
   text-align: center;
-  color: rgba(231,236,255,.92); /* softer white */
+  color: rgba(231,236,255,.92);
 }
-
 
 .summary-hero .accent {
   background: linear-gradient(90deg, #ffb347, #ff7e5f);
@@ -304,11 +345,7 @@ body {
   font-weight: 400;
 }
 
-/* Hide subtitle */
-.summary-hero .subtitle {
-  display: none;
-}
-
+.summary-hero .subtitle { display: none; }
 
 /* ===== Bubble wrap around the stack ===== */
 .summary-bubble {
@@ -324,26 +361,21 @@ body {
   box-shadow: 0 10px 30px rgba(0,0,0,.38), inset 0 1px 0 rgba(255,255,255,.06);
 }
 
-
-
-/* ===== Glowy, tactile fact cards ===== */
+/* ===== Glowy, tactile fact cards (no color changes) ===== */
 .fact-card.glow {
   position: relative;
+  align-items: center;
   padding: 16px 20px;
-  grid-template-columns: 36px 1fr;
+  grid-template-columns: 60px 1fr; /* match larger icon/thumbnail lane */
   border-radius: 18px;
   border: 1px solid rgba(255,255,255,.08);
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
-  box-shadow:
-    0 6px 22px rgba(0,0,0,.32),
-    inset 0 1px 0 rgba(255,255,255,.06);
+  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+  box-shadow: 0 6px 22px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.06);
   transition: transform .14s ease, box-shadow .14s ease, border-color .14s ease;
   overflow: hidden;
 }
 
 .fact-card.glow::before {
-  /* left gradient accent wash */
   content: "";
   position: absolute;
   inset: 0;
@@ -354,54 +386,146 @@ body {
 }
 
 .fact-card.glow:hover {
-  transform: translateY(-1px);
+  transform: translateY(-2px);
   box-shadow: 0 12px 30px rgba(0,0,0,.38), inset 0 1px 0 rgba(255,255,255,.06);
   border-color: rgba(92,225,230,.28);
 }
 
-.fact-card .icon {
-  width: 26px; height: 26px; font-size: 1rem;
-  display: grid; place-items: center;
-  background: var(--glass);
-  border: 1px solid var(--glass-border);
-  border-radius: 999px;
-  margin-top: 3px;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+/* Nicer summary text */
+.fact-card .summary {
+  font-size: 15px;
+  line-height: 1.5;
+  text-align: center;
+  margin: 10px auto 0;
+  max-width: 92%;
+  color: var(--text);
+  opacity: 0.95;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.25);
 }
 
-.fact-card p {
-  margin: 0;
-  line-height: 1.6;
-  font-size: 1.02rem;
-  text-wrap: pretty;
-}
-
-/* Emoji tints (keep from earlier) */
-.icon.blue  { color: #4da6ff; }
-.icon.green { color: #4caf50; }
-.icon.pink  { color: #ff5fa2; }
-
-/* Mobile tuning */
-@media (max-width: 420px) {
-  .summary-hero .title { font-size: clamp(32px, 9vw, 44px); }
-  .summary-bubble { padding: 14px; }
-  .fact-card.glow { grid-template-columns: 32px 1fr; padding: 14px 16px; }
-  .fact-card .icon { width: 24px; height: 24px; font-size: .95rem; }
-}
-
-/* --- Colorful variants for fact cards --- */
-.fact-card.glow {
+/* Flip animation */
+.flip-surface {
   position: relative;
-  padding: 16px 20px;
-  grid-template-columns: 36px 1fr;
-  border-radius: 18px;
-  border: 1px solid rgba(255,255,255,.08);
-  box-shadow: 0 6px 22px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.06);
-  transition: transform .14s ease, box-shadow .14s ease, border-color .14s ease;
-  overflow: hidden;
+  width: 100%;
+  min-height: 40px;
+}
+.flip-surface .front,
+.flip-surface .back {
+  transition: opacity .2s ease, transform .2s ease;
+}
+.flip-surface .back {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transform: translateY(6px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.flip-surface.flipped .front {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+.flip-surface.flipped .back {
+  opacity: 1;
+  transform: translateY(0);
 }
 
-/* Unique gradient washes per card */
+/* Mini toggle (icon-only circular) */
+.mini-toggle {
+  position: absolute;
+  right: 14px;
+  top: 14px;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.22);
+  transition: background .2s ease, transform .2s ease, opacity .2s ease;
+}
+.mini-toggle::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid rgba(255,255,255,0.8);
+  border-bottom: 2px solid rgba(255,255,255,0.8);
+  transform: rotate(45deg);
+  transition: transform .2s ease, opacity .2s ease;
+  opacity: 0.85;
+}
+.mini-toggle:hover { background: rgba(255,255,255,0.16); transform: translateY(-1px); }
+.mini-toggle.open::before { transform: rotate(-135deg); }
+
+@media (max-width: 520px) {
+  .mini-toggle {
+    right: 10px;
+    top: 10px;
+    width: 26px;
+    height: 26px;
+  }
+  .mini-toggle::before {
+    width: 7px;
+    height: 7px;
+    border-width: 2px;
+  }
+}
+
+/* (Optional) tiny fade-in on facts */
+.facts .fact-card {
+  opacity: 0;
+  transform: translateY(16px);
+  animation: fadeUp 2s ease forwards;
+}
+.facts .fact-card:nth-child(1) { animation-delay: .35s; }
+.facts .fact-card:nth-child(2) { animation-delay: 1.35s; }
+.facts .fact-card:nth-child(3) { animation-delay: 2.35s; }
+
+@keyframes fadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* === Learn (Wisdom/Gold) theme — scoped so other sections stay unchanged === */
+.learn {
+  --learn-gold-1: #ffe08a;
+  --learn-gold-2: #d4af37;
+  --learn-gold-3: #3a2a10;
+  --learn-border: rgba(212, 175, 55, .28);
+  --learn-wash-a: rgba(255, 224, 138, .16);
+  --learn-wash-b: rgba(212, 175, 55, .22);
+}
+
+.learn .section-hero .badge {
+  background: radial-gradient(120% 120% at 30% 20%, var(--learn-gold-1) 0%, var(--learn-gold-2) 60%, var(--learn-gold-3) 100%);
+  box-shadow: 0 10px 28px rgba(212, 175, 55, .35);
+  border: 1px solid rgba(255,255,255,.12);
+  color: #fff7e6;
+}
+
+.learn .section-hero .accent {
+  background: linear-gradient(90deg, var(--learn-gold-1), var(--learn-gold-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.learn .bubble-card {
+  background:
+    radial-gradient(120% 120% at 0% 0%, var(--learn-wash-a), transparent 60%),
+    radial-gradient(120% 120% at 100% 100%, var(--learn-wash-b), transparent 60%),
+    linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .02));
+  border: 1px solid var(--learn-border);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .38), inset 0 1px 0 rgba(255, 255, 255, .08);
+}
+
+/* --- Colorful variants for fact cards (unchanged colors) --- */
 .fact-card.variant-0 {
   background: linear-gradient(135deg, rgba(255,180,80,.15), rgba(255,140,0,.08));
   border-color: rgba(255,180,80,.3);
@@ -415,78 +539,367 @@ body {
   border-color: rgba(255,80,140,.3);
 }
 
-.fact-card.glow:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 30px rgba(0,0,0,.38), inset 0 1px 0 rgba(255,255,255,.06);
+.fact-card p,
+.fact-card a {
+  display: flex;
+  align-items: center;
+  min-height: 56px; /* matches the icon size for perfect optical centering */
 }
 
+.badge .badge-icon {
+  width: 90%;
+  height: 90%;
+  display: block;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+/* --- Hero polish --- */
 .summary-hero {
-  margin-bottom: 32px; /* adds clean spacing below the big header */
+  position: relative;
+  padding-top: 8px;
+  text-align: center;
+}
+.summary-hero::before {
+  /* soft radial glow behind the badge/title */
+  content: "";
+  position: absolute;
+  inset: -40px -20px auto -20px;
+  height: 160px;
+  background: radial-gradient(60px 60px at 50% 32%, rgba(255,255,255,.06), transparent 60%);
+  pointer-events: none;
+}
+.badge {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 10px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  /* assumes your existing orange bubble styles remain */
+}
+.badge-icon {
+  width: 38px;
+  height: 38px;
+  color: #fff;              /* white glyph inside orange circle */
+  display: block;
+}
+.badge-pulse {
+  /* super subtle breathing */
+  animation: badgePulse 3.2s ease-in-out infinite;
+}
+@keyframes badgePulse {
+  0%, 100% { transform: translateZ(0) scale(1); box-shadow: 0 0 0 rgba(0,0,0,0); }
+  50%      { transform: translateZ(0) scale(1.03); }
 }
 
-/* Softer main title so 'today' pops */
-.summary-hero .title {
-  font-weight: 300;
-  color: rgba(231,236,255,.92);
-  line-height: 1.1;
+.subdate {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: var(--muted);
+  letter-spacing: .2px;
 }
 
-/* Subtle hover/press */
-.fact-card.glow:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 14px 34px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.08);
-}
-.fact-card.glow:active {
-  transform: translateY(0);
-  box-shadow: 0 6px 20px rgba(0,0,0,.3);
-}
-
-/* (Optional) tiny fade-in */
+/* --- Card polish (no color changes) --- */
 .facts .fact-card {
-  opacity: 0;
-  transform: translateY(8px);
-  animation: fadeUp .5s ease forwards;
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+  will-change: transform;
 }
-.facts .fact-card:nth-child(1) { animation-delay: .05s; }
-.facts .fact-card:nth-child(2) { animation-delay: .15s; }
-.facts .fact-card:nth-child(3) { animation-delay: .25s; }
-
-@keyframes fadeUp {
-  to { opacity: 1; transform: translateY(0); }
+.facts .fact-card:hover,
+.facts .fact-card:focus-within {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
 }
 
-/* === Learn (Wisdom/Gold) theme — scoped so other sections stay unchanged === */
-.learn {
-  --learn-gold-1: #ffe08a;   /* light */
-  --learn-gold-2: #d4af37;   /* classic gold */
-  --learn-gold-3: #3a2a10;   /* deep shadow */
-  --learn-border: rgba(212, 175, 55, .28);
-  --learn-wash-a: rgba(255, 224, 138, .16);
-  --learn-wash-b: rgba(212, 175, 55, .22);
+/* bigger, square thumbnails */
+.icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;          /* square-ish, not circle */
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+}
+.icon .thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-/* Badge glow */
-.learn .section-hero .badge {
-  background: radial-gradient(120% 120% at 30% 20%, var(--learn-gold-1) 0%, var(--learn-gold-2) 60%, var(--learn-gold-3) 100%);
-  box-shadow: 0 10px 28px rgba(212, 175, 55, .35);
-  border: 1px solid rgba(255,255,255,.12);
-  color: #fff7e6;
+/* front/back flip is already there; make it feel snappier */
+.flip-surface {
+  transition: transform .28s ease;
 }
 
-/* Headline accent gradient */
-.learn .section-hero .accent {
-  background: linear-gradient(90deg, var(--learn-gold-1), var(--learn-gold-2));
+/* --- Next button micro-interaction (uses your existing .btn) --- */
+.btn {
+  transition: transform .08s ease, box-shadow .18s ease;
+}
+.btn:hover { box-shadow: var(--shadow); }
+.btn:active { transform: translateY(1px) scale(.98); }
+
+/* ===============================
+   STORY THEME (green rich gradient)
+   =============================== */
+.story-section .story-badge {
+  background: radial-gradient(circle at center, #95d5b2, #2d6a4f);
+  box-shadow: 0 0 20px rgba(82, 183, 136, 0.6); /* glowing aura */
+  color: #ffffff;
+}
+
+.story-section .story-accent {
+  background: linear-gradient(90deg, #d8f3dc, #74c69d, #2d6a4f);
   -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  -webkit-text-fill-color: transparent;
 }
 
-/* Bubble card with warm gold wash */
-.learn .bubble-card {
-  background:
-    radial-gradient(120% 120% at 0% 0%, var(--learn-wash-a), transparent 60%),
-    radial-gradient(120% 120% at 100% 100%, var(--learn-wash-b), transparent 60%),
-    linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .02));
-  border: 1px solid var(--learn-border);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, .38), inset 0 1px 0 rgba(255, 255, 255, .08);
+.story-section .story-card {
+  /* keep only the green skin; text color inherits from .bubble-card (var(--text)) */
+  background: linear-gradient(
+    145deg,
+    rgba(208, 244, 222, 0.15),
+    rgba(82, 183, 136, 0.25),
+    rgba(27, 67, 50, 0.9)
+  );
+  border: 1px solid #40916c;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
 }
+
+
+
+.story-section .story-btn {
+  background: #52b788;
+  color: #0b132b;
+}
+
+/* Nav: left/back <   right/forward > — calm, centered container */
+.nav-buttons {
+  display: flex;
+  justify-content: space-between; /* left vs right alignment */
+  align-items: center;
+  width: 100%;
+  max-width: 760px;     /* matches your card widths */
+  margin: 40px auto 0;
+  padding: 0 6px;       /* small padding so buttons don't hug edge */
+  box-sizing: border-box;
+}
+
+/* circular glass buttons */
+.nav-btn {
+  appearance: none;
+  border: 1px solid rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.03);
+  color: var(--text);
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: transform .12s ease, background .18s ease, border-color .18s ease, box-shadow .18s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.04);
+}
+
+/* calmer chevron look: slightly smaller, spaced */
+.nav-btn > * { letter-spacing: 2px; }
+
+/* forward button gets subtle accent */
+.nav-btn.primary {
+  border-color: rgba(92,225,230,0.22);
+  box-shadow: 0 6px 18px rgba(92,225,230,0.12), inset 0 1px 0 rgba(255,255,255,0.04);
+}
+
+/* hover/focus */
+.nav-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  background: rgba(255,255,255,0.06);
+}
+.nav-btn:active { transform: translateY(0); }
+.nav-btn:focus-visible { outline: none; box-shadow: 0 0 0 4px rgba(92,225,230,0.12); }
+
+/* disabled state (first card left button) */
+.nav-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+  transform: none;
+}
+
+/* responsive */
+@media (max-width: 420px) {
+  .nav-btn { width: 44px; height: 44px; font-size: 20px; }
+  .nav-buttons { max-width: 680px; padding: 0 4px; }
+}
+
+/* === SVG arrow look + glow/pulse (Option B) === */
+.nav-btn svg {
+  display: block;
+  width: 18px;
+  height: 18px;
+  color: currentColor; /* uses the button color via css color */
+  transition: transform .14s ease, filter .18s ease, color .18s ease;
+}
+
+/* forward accent color (uses current theme accent) */
+.nav-btn.primary {
+  color: rgba(92,225,230,0.98); /* forward arrow color */
+}
+
+/* thin stroke is defined in the inline SVG (strokeWidth ~1.6-1.8) */
+
+/* animated drop-shadow / glow on forward svg (soft) */
+.nav-btn.primary svg {
+  filter: drop-shadow(0 0 0 rgba(92,225,230,0));
+  animation: svgGlow 3s ease-in-out infinite;
+}
+
+/* hover: amplify glow slightly */
+.nav-btn.primary:hover svg { filter: drop-shadow(0 12px 34px rgba(92,225,230,0.16)); transform: scale(1.05); }
+
+/* keyframes for svg glow */
+@keyframes svgGlow {
+  0%   { filter: drop-shadow(0 0 0 rgba(92,225,230,0)); transform: scale(1); }
+  50%  { filter: drop-shadow(0 10px 26px rgba(92,225,230,0.12)); transform: scale(1.03); }
+  100% { filter: drop-shadow(0 0 0 rgba(92,225,230,0)); transform: scale(1); }
+}
+
+/* respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .nav-btn.primary svg { animation: none; transform: none; filter: none; }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.1); }
+}
+.nav-btn.pulse {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .nav-btn.pulse { animation: none; }
+}
+
+/* (FIXING LAG I THINK page container that you animate with framer-motion */
+.motion-page {
+  will-change: transform, opacity;
+  transform: translateZ(0); /* promote to its own layer */
+}
+
+/* the breathing orb already scales/fades — give it a layer too */
+.orb {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+}
+
+/* cards are isolated so the browser doesn’t repaint the whole page */
+.card, .card-body {
+  contain: content;
+}
+
+
+/* ===========================
+   BREATHING COMPONENT - SIMPLE (no glow)
+   =========================== */
+
+.breathing-shell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--text, #e7ecff);
+  padding: 18px;
+}
+
+.breathing-hero {
+  width: 100%;
+  max-width: 680px;
+  text-align: center;
+  padding-top: 24px;
+  box-sizing: border-box;
+}
+
+.breathing-bubble-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.breathing-bubble {
+  width: clamp(110px, 34vw, 160px);
+  aspect-ratio: 1 / 1;
+  max-height: min(42vh, 360px);
+  border-radius: 50%;
+  position: relative;
+  margin: 0 0 clamp(18px, 5vw, 56px);
+  background: radial-gradient(
+    circle at 30% 25%,
+    rgba(255,255,255,0.14),
+    rgba(64,192,200,0.18) 10%,
+    rgba(20,90,120,0.9) 70%
+  );
+  box-shadow:
+    0 12px 40px rgba(0,0,0,0.55),
+    inset 0 -10px 30px rgba(0,0,0,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-origin: center center;
+  will-change: transform, opacity;
+  transition: transform 220ms ease;
+}
+
+.bubble-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+}
+
+.bubble-highlight {
+  position: absolute;
+  left: 56%;
+  top: 14%;
+  width: 30%;
+  height: 30%;
+  border-radius: 50%;
+  filter: blur(10px);
+  background: radial-gradient(circle at 30% 25%, rgba(255,255,255,0.55), rgba(255,255,255,0.05) 55%);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  opacity: 0.4; /* static highlight */
+}
+
+.breathing-text {
+  margin: 0;
+  padding: 0 18px;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.breathing-label {
+  margin: 8px 0 0;
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--text);
+}
+
+.breathing-sub {
+  color: var(--muted, #a9b3d6);
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.breathing-sub .breathing-time {
+  margin-bottom: 4px;
+}
+
+.breathing-script {
+  color: var(--muted, #a9b3d6);
+  max-width: 640px;
+  margin: 12px auto 0;
+  font-size: 15px;
+  line-height: 1.4;
+  text-align: center;
+}
+
