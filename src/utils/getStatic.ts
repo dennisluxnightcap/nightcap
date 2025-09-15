@@ -51,7 +51,7 @@ const BREATHING: Breathing[] = [
   { pattern: "4-7-8", rounds: 3, script: "Inhale 4, hold 7, exhale 8. Slow and steady." },
   { pattern: "Box 4-4-4-4", rounds: 4, script: "Inhale 4, hold 4, exhale 4, hold 4 — draw a square with your breath." },
   { pattern: "5-5", rounds: 5, script: "Inhale 5, exhale 5. Smooth, even rhythm." },
-  { pattern: "6-2-6", rounds: 4, script: "Inhale 6, hold 2, exhale 6. Relax your shoulders." }
+  { pattern: "6-2-6", rounds: 4, script: "Inhale 6, hold 2, exhale 6." }
 ];
 
 /** Final export */
