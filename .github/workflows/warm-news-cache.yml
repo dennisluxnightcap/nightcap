@@ -1,0 +1,23 @@
+name: Warm News Cache
+
+# Runs once per day at 01:00 UTC. Change cron if you want different cadence.
+on:
+  schedule:
+    - cron: "0 1 * * *"
+  workflow_dispatch: {} # allow manual runs from the Actions tab
+
+jobs:
+  warm:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Warm cache (call API)
+        env:
+          API_URL: ${{ secrets.PROD_API_URL }}
+        run: |
+          if [ -z "$API_URL" ]; then
+            echo "PROD_API_URL secret is not set. Set it in repo Settings → Secrets → Actions"
+            exit 1
+          fi
+          echo "Calling $API_URL/api/dailyNews?n=3&image=1"
+          # call the endpoint; print HTTP code & time
+          curl -s -o /dev/null -w "HTTP %{http_code} in %{time_total}s\n" "$API_URL/api/dailyNews?n=3&image=1"
