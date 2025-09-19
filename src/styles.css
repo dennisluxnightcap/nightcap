@@ -851,12 +851,15 @@ body {
   border-radius: 50%;
   position: relative;
   margin: 0 0 clamp(18px, 5vw, 56px);
-  background: radial-gradient(
-    circle at 30% 25%,
-    rgba(255,255,255,0.14),
-    rgba(64,192,200,0.18) 10%,
-    rgba(20,90,120,0.9) 70%
-  );
+ background: radial-gradient(
+  circle at 30% 25%,
+  rgba(255, 240, 180, 0.25),
+  rgba(255, 210, 80, 0.35) 20%,
+  rgba(140, 100, 20, 0.85) 75%
+);
+
+
+
   box-shadow:
     0 12px 40px rgba(0,0,0,0.55),
     inset 0 -10px 30px rgba(0,0,0,0.2);
@@ -1039,3 +1042,98 @@ body {
 }
 
 
+/* ===============================
+   BREATHING TEXT UNIFIED STYLE
+   =============================== */
+.breathing-script,
+.breathing-label,
+.breathing-sub {
+  font-family: "Manrope", Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: clamp(18px, 2.6vw, 22px);
+  line-height: 1.7;
+  text-align: center;
+  color: #ffffff; /* match bubble-card text */
+  text-wrap: pretty;
+  -webkit-text-stroke: 0.2px black;
+  text-shadow: 2px 3px 44px rgba(0, 0, 0, 0.9);
+}
+
+
+/* ===============================
+   END SCREEN (Good Night)
+   =============================== */
+.goodnight {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.goodnight h2 {
+  font-family: "Manrope", Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: clamp(32px, 7vw, 56px);
+  font-weight: 400;
+  text-align: center;
+  color: #ffffff;
+  text-wrap: pretty;
+  -webkit-text-stroke: 0.3px black;
+  text-shadow: 2px 3px 44px rgba(0, 0, 0, 0.85);
+  margin-bottom: 16px;
+}
+
+.goodnight p {
+  font-family: "Manrope", Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 18px;
+  line-height: 1.6;
+  color: var(--muted, #a9b3d6);
+  text-align: center;
+  text-shadow: 1px 2px 18px rgba(0, 0, 0, 0.6);
+}
+
+
+
+/* ===============================
+   BREATHING — apply skin to the existing card (no nested boxes)
+   =============================== */
+
+/* Style ONLY the .card that contains the breathing component */
+.card:has(.breathing-shell) {
+  position: relative;
+  overflow: hidden;
+  /* gentle night-sky gradient that still matches the app blues */
+  background:
+    radial-gradient(circle at 50% 20%, rgba(92, 225, 230, 0.12), transparent 60%),
+    linear-gradient(180deg, #0b132b 0%, #13244d 50%, #091020 100%);
+  /* a touch deeper than the default card shadow */
+  box-shadow: 0 12px 36px rgba(0,0,0,0.6);
+}
+
+/* Subtle star twinkle overlay (behind content) */
+.card:has(.breathing-shell)::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(3px 3px at 20% 30%, rgba(255,255,255,0.95), transparent),
+    radial-gradient(2px 2px at 70% 60%, rgba(173, 216, 230, 0.9), transparent),
+    radial-gradient(2.5px 2.5px at 40% 80%, rgba(255,255,255,0.95), transparent);
+  background-repeat: no-repeat;
+  opacity: 0.55;
+  animation: stars 6s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: 0; /* sit behind the content */
+}
+
+@keyframes stars {
+  from { opacity: 0.30; }
+  to   { opacity: 0.70; }
+}
+
+/* Make sure the breathing content isn’t rendering another “card” */
+.card:has(.breathing-shell) .breathing-hero,
+.card:has(.breathing-shell) .goodnight,
+.card:has(.breathing-shell) .breathing-shell {
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  position: relative;
+  z-index: 1; /* above the star overlay */
+}
