@@ -7,9 +7,11 @@ import Breathing from "./components/Breathing";
 import FeelGoodFact from "./components/FeelGoodFact";
 import LearnFact from "./components/LearnFact";
 import Story from "./components/Story";
+import HistoryCard from "./components/HistoryCard"; // ✅ new import
 import { motion, AnimatePresence } from "framer-motion";
 
-const steps = ["Summary", "Feel-good", "Learn", "Story", "Breathe"] as const;
+// ✅ added "History" to steps
+const steps = ["Summary", "Feel-good", "Learn", "History", "Story", "Breathe"] as const;
 type Step = (typeof steps)[number];
 
 export default function App() {
@@ -44,7 +46,6 @@ export default function App() {
           {step === "Summary" && (
             <div>
               <DailySummary />
-
               <div style={{ marginTop: 16 }}>
                 <nav
                   className="nav-buttons"
@@ -83,6 +84,11 @@ export default function App() {
 
           {step === "Learn" && (
             <LearnFact text={daily.learn} onNext={next} onPrev={maybePrev} />
+          )}
+
+          {/* ✅ New History step */}
+          {step === "History" && (
+            <HistoryCard onNext={next} onPrev={maybePrev} />
           )}
 
           {step === "Story" && (

@@ -1,69 +1,104 @@
-import { useEffect, useState } from "react";
-import { getHeadlines, type Headline } from "../utils/getHeadlines";
+// src/components/HeadlineCard.tsx
+import React, { useEffect, useState } from "react";
 
-const icons = ["🌍", "📈", "❤️", "✨", "🧠", "📰"];
+type NewsItem = {
+  title: string;
+  url: string;
+  image: string | null;
+  publishedAt: string;
+};
 
-function faviconFor(url?: string) {
-  if (!url) return undefined;
-  try {
-    const u = new URL(url);
-    return `https://www.google.com/s2/favicons?sz=64&domain=${u.hostname}`;
-  } catch {
-    return undefined;
-  }
-}
-
-export default function HeadlineCard() {
-  const [items, setItems] = useState<Headline[] | null>(null);
+export default function HeadlineCard({ n = 5 }: { n?: number }) {
+  const [items, setItems] = useState<NewsItem[] | null>(null);
+  const [err, setErr] = useState<string | null>(null);
 
   useEffect(() => {
-    getHeadlines().then(setItems);
-  }, []);
+    let cancelled = false;
 
+    (async () => {
+      try {
+        setErr(null);
+        const r = await fetch(`/api/dailyNews?n=${n}&image=1&topic=world&lang=en`, {
+          headers: { Accept: "application/json" },
+        });
+        if (!r.ok) throw new Error(await r.text());
+        const data = await r.json();
+        if (!cancelled) setItems(Array.isArray(data.items) ? data.items : []);
+      } catch (e: any) {
+        if (!cancelled) {
+          setErr(e?.message || "Failed to load headlines");
+          setItems([]);
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [n]);
+
+  // Loading
   if (items === null) {
     return (
       <div className="facts">
-        <div className="fact-card glow">
-          <span className="icon">📝</span>
-          <p>Loading headlines…</p>
-        </div>
+        {[...Array(n)].map((_, i) => (
+          <div key={i} className="fact-card glow" aria-busy="true">
+            <div
+              className="headline-media skeleton"
+              style={{ height: 80, width: 80, borderRadius: 8, marginRight: 12 }}
+            />
+            <p className="headline" style={{ opacity: 0.6 }}>Loading headline…</p>
+          </div>
+        ))}
       </div>
     );
   }
 
-  if (!items.length) {
+  // Empty / Error
+  if (err || items.length === 0) {
     return (
       <div className="facts">
         <div className="fact-card glow">
-          <span className="icon">📝</span>
-          <p>No headlines loaded.</p>
+          <p className="headline">Couldn’t load today’s headlines.</p>
         </div>
       </div>
     );
   }
 
+  // Content
   return (
     <div className="facts">
-      {items.map((it, i) => {
-        const thumb = faviconFor(it.url);
-        return (
-          <div
-            key={i}
-            className={`fact-card glow variant-${i}`}
-            onClick={() => it.url && window.open(it.url, "_blank", "noopener,noreferrer")}
-            role={it.url ? "link" : "group"}
-            tabIndex={0}
-          >
-            <span
-              className={`icon ${i % 3 === 0 ? "blue" : i % 3 === 1 ? "green" : "pink"}`}
-              aria-hidden
-            >
-              {thumb ? <img className="thumb" src={thumb} alt="" /> : icons[i % icons.length]}
-            </span>
-            <p className="headline">{it.title}</p>
-          </div>
-        );
-      })}
+      {items.map((it, i) => (
+        <div
+          key={it.url || i}
+          className={`fact-card glow variant-${i}`}
+          onClick={() => it.url && window.open(it.url, "_blank", "noopener,noreferrer")}
+          role={it.url ? "link" : "group"}
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if ((e.key === "Enter" || e.key === " ") && it.url) {
+              window.open(it.url, "_blank", "noopener,noreferrer");
+            }
+          }}
+          style={{ display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }}
+        >
+          {it.image && (
+            <img
+              src={it.image}
+              alt={it.title}
+              loading="lazy"
+              style={{
+                width: 80,
+                height: 80,
+                objectFit: "cover",
+                borderRadius: 8,
+                flexShrink: 0,
+              }}
+            />
+          )}
+          <p className="headline" style={{ flex: 1 }}>{it.title}</p>
+        </div>
+      ))}
     </div>
   );
 }
