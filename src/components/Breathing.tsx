@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { motion, useAnimation } from "framer-motion";
+import { motion, useAnimation, AnimatePresence } from "framer-motion";
 
 type PatternObj = { inhale: number; hold?: number; exhale: number };
 export type Breathing = {
@@ -34,10 +34,9 @@ export default function Breathing({
 
   const controls = useAnimation();
 
-  // add `done` phase
   const [phase, setPhase] = useState<
-    "idle" | "inhale" | "hold" | "exhale" | "done"
-  >("idle");
+    "getready" | "inhale" | "hold" | "exhale" | "done"
+  >("getready");
 
   const [remainingSec, setRemainingSec] = useState<number | null>(null);
   const timerRef = useRef<number | null>(null);
@@ -68,9 +67,12 @@ export default function Breathing({
     const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
     const run = async () => {
-      await controls.set({ scale: 1, opacity: 1, ["--glow" as any]: 0 });
-      setPhase("idle");
+      await controls.set({ scale: 1, ["--glow" as any]: 0 });
+      setPhase("getready");
       setRemainingSec(null);
+
+      // ✅ Longer delay before first inhale
+      await sleep(3000);
 
       for (let r = 0; r < rounds && alive; r++) {
         // inhale
@@ -78,7 +80,6 @@ export default function Breathing({
         startCountdown(parsed.inhale);
         await controls.start({
           scale: 1.35,
-          opacity: 1,
           ["--glow" as any]: 0.9,
           transition: {
             type: "tween",
@@ -93,16 +94,13 @@ export default function Breathing({
           setPhase("hold");
           startCountdown(parsed.hold);
           await controls.start({
-            opacity: [1, 0.96, 1],
             ["--glow" as any]: 1,
             transition: {
               type: "tween",
               ease: "easeInOut",
               duration: parsed.hold,
-              times: [0, 0.5, 1],
             },
           });
-          await controls.set({ opacity: 1, ["--glow" as any]: 1 });
         }
         if (!alive) break;
 
@@ -125,17 +123,9 @@ export default function Breathing({
 
       if (!alive) return;
 
-      // 🔥 new done state instead of idle
+      // just switch phase – AnimatePresence will fade
       setPhase("done");
       setRemainingSec(null);
-
-      // fade out orb
-      await controls.start({
-        scale: 1,
-        opacity: 0,
-        ["--glow" as any]: 0,
-        transition: { type: "tween", duration: 3, ease: "easeInOut" },
-      });
 
       onComplete?.();
     };
@@ -149,7 +139,7 @@ export default function Breathing({
   }, [pattern, rounds]);
 
   const labelForPhase = {
-    idle: "Breathe",
+    getready: "Get ready…",
     inhale: "Breathe in",
     hold: "Hold",
     exhale: "Breathe out",
@@ -157,51 +147,59 @@ export default function Breathing({
   } as const;
 
   const countdownText =
-    remainingSec == null ? null : `${Math.ceil(remainingSec)}s`;
+    phase === "getready" || remainingSec == null
+      ? null
+      : `${Math.ceil(remainingSec)}s`;
 
   return (
     <section className="breathing-shell">
       <div className="breathing-hero">
-        {phase !== "done" ? (
-          <>
-            <div className="breathing-bubble-row" aria-hidden>
-              <motion.div
-                className={`breathing-bubble ${phase}`}
-                animate={controls}
-                initial={false}
-                style={{ originX: 0.5, originY: 0.5, ["--glow" as any]: 0 }}
-              >
-                <div className="bubble-inner" />
-                <div className="bubble-highlight" />
-              </motion.div>
-            </div>
-
-            <div className="breathing-text">
-              <h3 className="breathing-label">{labelForPhase[phase]}</h3>
-              <div className="breathing-sub">
-                <div className="breathing-time">
-                  {countdownText ??
-                    (phase === "idle"
-                      ? `${parsed.inhale}s / ${parsed.exhale}s`
-                      : null)}
-                </div>
+        <AnimatePresence mode="wait">
+          {phase !== "done" ? (
+            <motion.div
+              key="orb"
+              className="breathing-content"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -30 }}
+              transition={{ duration: 1.5, ease: "easeInOut" }}
+            >
+              <div className="breathing-bubble-row" aria-hidden>
+                <motion.div
+                  className={`breathing-bubble ${phase}`}
+                  animate={controls}
+                  initial={false}
+                  style={{ originX: 0.5, originY: 0.5, ["--glow" as any]: 0 }}
+                >
+                  <div className="bubble-inner" />
+                  <div className="bubble-highlight" />
+                </motion.div>
               </div>
-              {script ? <p className="breathing-script">{script}</p> : null}
-            </div>
-          </>
-        ) : (
-          <motion.div
-            className="goodnight"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 3, ease: "easeOut" }}
-          >
-            <h2>Good night 🌙</h2>
-            <p className="breathing-script">
-              Sleep well, you’re all set for today.
-            </p>
-          </motion.div>
-        )}
+
+              <div className="breathing-text">
+                <h3 className="breathing-label">{labelForPhase[phase]}</h3>
+                <div className="breathing-sub">
+                  <div className="breathing-time">{countdownText}</div>
+                </div>
+                {script ? <p className="breathing-script">{script}</p> : null}
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="goodnight"
+              className="goodnight"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 5, ease: "easeInOut" }}
+            >
+              <h2>Good night 🌙</h2>
+              <p className="breathing-script">
+                Sleep well, you’re all set for today.
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </section>
   );

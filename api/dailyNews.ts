@@ -26,10 +26,24 @@ const normalizeTitle = (t: string) =>
   (t || "").toLowerCase().replace(/[^a-z0-9\s]/g, "").replace(/\s+/g, " ").trim();
 
 /* ---------- blacklist ---------- */
+/* ---------- blacklist ---------- */
 const BLACKLIST = ["dailymail.co.uk", "mailonline.com"];
+
 function isBlacklisted(url: string): boolean {
-  return BLACKLIST.some(bad => url.includes(bad));
+  try {
+    const hostname = new URL(url).hostname.toLowerCase();
+
+    // 🚫 Block any .ie domain (handles www.thesun.ie, independent.ie, rte.ie, etc.)
+    if (/\.(ie)$/.test(hostname)) return true;
+
+    // 🚫 Block explicit domains
+    return BLACKLIST.some(bad => hostname.includes(bad));
+  } catch {
+    return false;
+  }
 }
+
+
 
 /* ---------- fuzzy dedupe ---------- */
 function titleSimilarity(a: string, b: string): number {

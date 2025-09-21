@@ -1,3 +1,4 @@
+// utils/getStatic.ts
 import type { Breathing } from "@/types";
 import { stories } from "./storyPool";
 
@@ -24,34 +25,39 @@ function pickByDate<T>(arr: T[], date: Date = new Date()): T {
   return arr[idx];
 }
 
+/** Types */
+type Fact = {
+  text: string;
+  image?: string; // optional, so you can add images gradually
+};
+
 /** Fact pools */
-const FEELGOOD: string[] = [
-  "Sea otters hold hands while they sleep so they don’t drift apart.",
-  "Penguins propose with pebbles.",
-  "Cows have best friends and get stressed when separated.",
-  "Elephants recognize themselves in mirrors.",
-  "A group of kittens is called a kindle.",
-  "Bees can recognize human faces.",
-  "Dogs’ noses are as unique as fingerprints.",
-  "Humpback whales compose local “hit songs.”"
+const FEELGOOD: Fact[] = [
+  { text: "Cows have best friends and get stressed when separated.", image: "/images/cows.png" },
+  { text: "Elephants recognize themselves in mirrors.", image: "/images/elephants.png" },
+  { text: "A group of kittens is called a kindle.", image: "/images/kitten.png" },
+  { text: "Bees can recognize human faces.", image: "/images/bees.png" },
+  { text: "Dogs’ noses are as unique as fingerprints.", image: "/images/dognose.png" },
+  { text: "Humpback whales compose local “hit songs.”", image: "/images/whales.png" },
+  { text: "Penguins propose with pebbles.", image: "/images/penguins.png" },
 ];
 
-const LEARN: string[] = [
-  "Sharks are older than trees.",
-  "Bananas are berries, strawberries aren’t.",
-  "A day on Venus is longer than a year on Venus.",
-  "Octopuses have three hearts and blue blood.",
-  "Water can boil and freeze at the same time (triple point).",
-  "The Eiffel Tower can grow ~15 cm in summer heat.",
-  "Lightning can strike the same place twice (and often does).",
-  "Honey never spoils when sealed."
+const LEARN: Fact[] = [
+  { text: "Sharks are older than trees.", image: "/images/sharks.png" },
+  { text: "Bananas are berries, strawberries aren’t.", image: "/images/bananas.png" },
+  { text: "A day on Venus is longer than a year on Venus.", image: "/images/venus.png" },
+  { text: "Octopuses have three hearts and blue blood.", image: "/images/octopus.png" },
+  { text: "Water can boil and freeze at the same time (triple point).", image: "/images/water.png" },
+  { text: "The Eiffel Tower can grow ~15 cm in summer heat.", image: "/images/eiffel.png" },
+  { text: "Lightning can strike the same place twice (and often does).", image: "/images/lightning.png" },
+  { text: "Honey never spoils when sealed.", image: "/images/honey.png" },
 ];
 
 const BREATHING: Breathing[] = [
   { pattern: "4-7-8", rounds: 3, script: "Inhale 4, hold 7, exhale 8. Slow and steady." },
   { pattern: "Box 4-4-4-4", rounds: 4, script: "Inhale 4, hold 4, exhale 4, hold 4 — draw a square with your breath." },
   { pattern: "5-5", rounds: 5, script: "Inhale 5, exhale 5. Smooth, even rhythm." },
-  { pattern: "6-2-6", rounds: 4, script: "Inhale 6, hold 2, exhale 6." }
+  { pattern: "6-2-6", rounds: 4, script: "Inhale 6, hold 2, exhale 6." },
 ];
 
 /** Final export */
@@ -59,7 +65,7 @@ export function getStaticContent(date: Date = new Date()) {
   return {
     feelGood: pickByDate(FEELGOOD, date),
     learn: pickByDate(LEARN, date),
-    story: pickByDate(stories, date),    // 👈 pulls from storyPool.ts
+    story: pickByDate(stories, date), // ✅ stories are now { text, image }
     breathing: pickByDate(BREATHING, date),
   };
 }

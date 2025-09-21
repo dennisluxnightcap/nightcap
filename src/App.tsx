@@ -1,3 +1,4 @@
+// App.tsx
 import { useEffect, useState } from "react";
 import { getDaily } from "./utils/getDaily";
 import DailySummary from "./components/DailySummary";
@@ -7,16 +8,17 @@ import Breathing from "./components/Breathing";
 import FeelGoodFact from "./components/FeelGoodFact";
 import LearnFact from "./components/LearnFact";
 import Story from "./components/Story";
-import HistoryCard from "./components/HistoryCard"; // ✅ new import
+import HistoryCard from "./components/HistoryCard";
 import { motion, AnimatePresence } from "framer-motion";
 
-// ✅ added "History" to steps
+// ✅ Steps
 const steps = ["Summary", "Feel-good", "Learn", "History", "Story", "Breathe"] as const;
 type Step = (typeof steps)[number];
 
 export default function App() {
   const [daily, setDaily] = useState<Daily | null>(null);
   const [stepIndex, setStepIndex] = useState(0);
+  const [direction, setDirection] = useState<"next" | "prev">("next");
   const step: Step = steps[stepIndex];
 
   useEffect(() => {
@@ -25,8 +27,16 @@ export default function App() {
 
   if (!daily) return <div className="shell">Loading…</div>;
 
-  const next = () => setStepIndex((i) => Math.min(i + 1, steps.length - 1));
-  const prev = () => setStepIndex((i) => Math.max(i - 1, 0));
+  const next = () => {
+    setDirection("next");
+    setStepIndex((i) => Math.min(i + 1, steps.length - 1));
+  };
+
+  const prev = () => {
+    setDirection("prev");
+    setStepIndex((i) => Math.max(i - 1, 0));
+  };
+
   const restart = () => setStepIndex(0);
   const maybePrev = stepIndex > 0 ? prev : undefined;
 
@@ -38,10 +48,10 @@ export default function App() {
         <motion.div
           key={step}
           className="motion-page"
-          initial={{ opacity: 0, x: 40 }}
+          initial={{ opacity: 0, x: 120 }}
           animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -40 }}
-          transition={{ duration: 0.5 }}
+          exit={{ opacity: 0, x: -120 }}
+          transition={{ duration: 1.2, ease: "easeInOut" }}
         >
           {step === "Summary" && (
             <div>
@@ -79,25 +89,37 @@ export default function App() {
           )}
 
           {step === "Feel-good" && (
-            <FeelGoodFact text={daily.feelGood} onNext={next} onPrev={maybePrev} />
+            <FeelGoodFact
+              text={daily.feelGood.text}
+              image={daily.feelGood.image}
+              onNext={next}
+              onPrev={maybePrev}
+            />
           )}
 
           {step === "Learn" && (
-            <LearnFact text={daily.learn} onNext={next} onPrev={maybePrev} />
+            <LearnFact
+              text={daily.learn.text}
+              image={daily.learn.image}
+              onNext={next}
+              onPrev={maybePrev}
+            />
           )}
 
-          {/* ✅ New History step */}
-          {step === "History" && (
-            <HistoryCard onNext={next} onPrev={maybePrev} />
-          )}
+          {step === "History" && <HistoryCard onNext={next} onPrev={maybePrev} />}
 
           {step === "Story" && (
-            <Story text={daily.story} onNext={next} onPrev={maybePrev} />
+            <Story
+              text={daily.story.text}   // ✅ text
+              image={daily.story.image} // ✅ image
+              onNext={next}
+              onPrev={maybePrev}
+            />
           )}
 
           {step === "Breathe" && (
             <Card>
-              <Breathing {...daily.breathing} />
+              <Breathing key="breathing-session" {...daily.breathing} />
               <div className="row" style={{ marginTop: 12 }}>
                 <nav className="nav-buttons" aria-label="Breathing navigation">
                   <button
