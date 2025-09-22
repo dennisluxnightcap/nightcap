@@ -1035,13 +1035,18 @@ body {
 
 .fact-card .headline {
   font-family: "Manrope", Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-  font-size: 17px;
-  line-height: 1.55;
+  font-size: clamp(14px, 2.6vw, 19px);   /* same scaling as bubble-card p */
+  line-height: 1.7;
   font-weight: 400;
   color: #ffffff;
+  text-align: center;
   text-wrap: pretty;
-  text-align: center;   /* center the text */
+
+  /* match bubble-card / goodnight readability */
+  -webkit-text-stroke: 0.2px black;
+  
 }
+
 
 
 /* ===============================
@@ -1207,11 +1212,140 @@ body {
   color: #ffffff;
   text-wrap: pretty;
 
-  -webkit-text-stroke: 0.2px black;
-  text-shadow: 2px 3px 44px rgba(0, 0, 0, 0.9);
+  /* Stronger outline and tighter shadow for readability */
+  -webkit-text-stroke: 0.3px black; /* slightly thicker */
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.85); /* sharper + less diffused */
+}
+
+.story-section .section-hero {
+  margin: 10px 0 28px; /* was 6px, now gives more breathing room */
 }
 
 
 
 
 
+/* ===============================
+   UNIVERSAL FACT CARD SIZING FIX
+   =============================== */
+.fact-content {
+  display: flex;
+  align-items: stretch;     /* image + text equal height */
+  gap: 16px;
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(179, 139, 255, 0.25);
+  box-shadow: 0 0 18px rgba(179, 139, 255, 0.2);
+  background: rgba(255, 255, 255, 0.02);
+  overflow: hidden;         /* ✅ prevents “out of box” */
+}
+
+.fact-image {
+  flex: 0 0 40%;            /* take 40% of row */
+  max-width: 40%;           /* don’t grow beyond */
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.fact-text {
+  flex: 1;
+  font-size: 1.4rem;
+  line-height: 1.6;
+  font-weight: 500;
+  color: #e7ecff;
+  padding-left: 14px;
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+}
+
+/* Mobile: stack image above text */
+@media (max-width: 600px) {
+  .fact-content {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 14px;
+  }
+
+  .fact-image {
+    flex: none;
+    max-width: 100%;       /* full width */
+    margin-bottom: 12px;
+  }
+
+  .fact-text {
+    border-left: none;                         /* remove side line */
+    border-top: 1px solid rgba(255,255,255,0.1); /* add gentle top line */
+    padding-left: 0;
+    padding-top: 10px;
+    margin-top: 10px;                          /* space before top line */
+  }
+}
+
+
+.mood-row {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border-radius: 32px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(6px);
+}
+
+.mood-hero .title {
+  margin-bottom: 32px; /* add more space under the question */
+}
+
+
+
+
+.mood-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+}
+
+.mood-btn.active {
+  color: #ff4d4d;
+  transform: scale(1.15);
+  box-shadow: 0 0 12px rgba(255,77,77,0.6);
+  animation: moodPulse 1.6s ease-in-out infinite; /* 👈 add pulse */
+}
+
+@keyframes moodPulse {
+  0%, 100% {
+    transform: scale(1.15);
+    box-shadow: 0 0 12px rgba(255,77,77,0.6);
+  }
+  50% {
+    transform: scale(1.25);
+    box-shadow: 0 0 20px rgba(255,77,77,0.9);
+  }
+}
+
+
+/* ===============================
+   MOOD THEME OVERRIDE
+   =============================== */
+.mood-hero .badge {
+  background: radial-gradient(
+    circle at center,
+    rgba(255, 100, 100, 0.9),
+    rgba(255, 0, 0, 0.6)
+  );
+}
+
+.accent-red {
+  background: linear-gradient(90deg, #ff9a76, #ff4d4d, #d92b1b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}

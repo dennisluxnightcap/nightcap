@@ -33,14 +33,14 @@ export const stories = [
   },
   {
     text: `In 2018, in India, a boy fell into a deep borewell and was trapped for hours. While rescue teams worked, a stray cow stood near the opening the entire time, refusing to leave. Villagers said it mooed whenever the boy called out, almost as if answering him. When the boy was finally pulled to safety, the cow licked his face before walking away. The family later said they believed the animal had stayed to comfort their son in the dark.`,
-    image: undefined,
+    image: "/images/indiacow.png",
   },
   {
     text: `In the 1970s, in the Pacific Ocean, a sailor fell overboard at night during a storm. Just as he thought he’d be lost, a group of pilot whales appeared, nudging him toward the surface and keeping him afloat until his ship’s crew spotted the disturbance and pulled him back. The sailor later said he owed his life to “angels of the sea” — giant, gentle creatures that seemed to know he needed help.`,
-    image: "/images/oceanstory.png", // ✅ your new image
+    image: "/images/oceanstory.png", // ✅ your existing ocean image
   },
   {
     text: `In 2019, in Poland, firefighters responded to reports of a child missing in the woods. When they finally located him hours later, he was asleep under a tree — curled up against his family’s dog. The dog had stayed by his side all night in the cold, keeping him warm. Rescuers said the boy likely would not have survived the freezing temperatures alone. The photo of the child clinging to his dog after being found spread worldwide as a reminder of loyalty and love.`,
-    image: undefined,
+    image: "/images/polanddog.png", // ✅ new image added
   },
 ];

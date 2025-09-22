@@ -9,10 +9,11 @@ import FeelGoodFact from "./components/FeelGoodFact";
 import LearnFact from "./components/LearnFact";
 import Story from "./components/Story";
 import HistoryCard from "./components/HistoryCard";
+import MoodSlider from "./components/MoodSlider"; // ✅ new import
 import { motion, AnimatePresence } from "framer-motion";
 
-// ✅ Steps
-const steps = ["Summary", "Feel-good", "Learn", "History", "Story", "Breathe"] as const;
+// ✅ Steps (Mood added before Breathe)
+const steps = ["Summary", "Feel-good", "Learn", "History", "Story", "Mood", "Breathe"] as const;
 type Step = (typeof steps)[number];
 
 export default function App() {
@@ -110,12 +111,65 @@ export default function App() {
 
           {step === "Story" && (
             <Story
-              text={daily.story.text}   // ✅ text
-              image={daily.story.image} // ✅ image
+              text={daily.story.text}
+              image={daily.story.image}
               onNext={next}
               onPrev={maybePrev}
             />
           )}
+
+          {step === "Mood" && (
+  <Card>
+    <MoodSlider onComplete={next} />
+    <div className="row" style={{ marginTop: 12 }}>
+      <nav className="nav-buttons" aria-label="Mood navigation">
+        <button
+          className="nav-btn primary"
+          onClick={prev}
+          aria-label="Back"
+          title="Back"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden
+          >
+            <path
+              d="M16 19L8 12l8-7"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+        <button
+          className="nav-btn primary pulse"   // ✅ added pulse here
+          onClick={next}
+          aria-label="Next"
+          title="Next"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden
+          >
+            <path
+              d="M8 5l8 7-8 7"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+      </nav>
+    </div>
+  </Card>
+)}
+
 
           {step === "Breathe" && (
             <Card>
