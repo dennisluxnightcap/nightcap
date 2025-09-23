@@ -1,8 +1,17 @@
+// DailySummary.tsx
 import HeadlineCard from "./HeadlineCard";
+import BrightSpot from "./BrightSpot";
+import type { Brightspot } from "../types";
 
-export default function DailySummary() {
+export default function DailySummary({
+  onNext,
+  spot,
+}: {
+  onNext: () => void;
+  spot: Brightspot;
+}) {
   return (
-    <section>
+    <section className="daily-summary">
       <header className="section-hero summary-hero">
         <div className="badge">
           <img src="/icons/daily.png" alt="Daily recap" className="badge-icon" />
@@ -12,9 +21,10 @@ export default function DailySummary() {
         </h2>
       </header>
 
-      {/* Single source of truth for headlines; fetching happens inside HeadlineCard */}
       <HeadlineCard />
+
+      {/* Bright Spot footer */}
+      <BrightSpot spot={spot} onNext={onNext} />
     </section>
   );
 }
-

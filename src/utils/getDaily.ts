@@ -16,16 +16,12 @@ export async function getDaily(d: Date = new Date()): Promise<Daily> {
   const staticContent = getStaticContent(d);
 
   return {
-    // ✅ summary still comes from default.json if it exists
     summary: daily?.summary ?? [],
-
-    // ✅ these rotate daily from your lists
     feelGood: staticContent.feelGood,
     learn: staticContent.learn,
-
-    // ✅ now story is pulled from default.json
     story: staticContent.story,
-
     breathing: staticContent.breathing,
+    brightspot: staticContent.brightspot, // ✅ included
   };
 }
+

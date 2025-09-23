@@ -1,3 +1,5 @@
+// types.ts
+
 export type Breathing = { 
   pattern: string; 
   rounds: number; 
@@ -14,13 +16,20 @@ export type SummaryItem = {
 // Shared type for fact-like cards
 export type Fact = {
   text: string;
-  image?: string; // optional so you can add later
+  image?: string;
+};
+
+// ✅ Brightspot type is just a Fact with extras
+export type Brightspot = Fact & {
+  source?: string;
+  year?: number;
 };
 
 export type Daily = {
   summary: (string | SummaryItem)[];
-  feelGood: Fact;  // ✅ object with text + optional image
-  learn: Fact;     // ✅ object with text + optional image
-  story: Fact;     // ✅ changed from string → Fact
+  feelGood: Fact;
+  learn: Fact;
+  story: Fact;
   breathing: Breathing;
+  brightspot: Brightspot; // ✅ add here
 };

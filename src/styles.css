@@ -150,7 +150,31 @@ body {
   max-width: 640px;
   margin: 0 auto;
   padding-top: 8px;
+
+  position: relative;   /* needed for ::after fade */
+  overflow: hidden;     /* so the gradient stays inside */
 }
+
+.facts::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 520px;  /* 👈 taller overlay so it reaches up earlier */
+  background: linear-gradient(
+    to bottom,
+    rgba(11, 19, 43, 0) 0%,     /* fully transparent top */
+    rgba(11, 19, 43, 0.15) 10%, /* fade starts very early */
+    rgba(11, 19, 43, 0.35) 30%, /* mid fade already visible */
+    rgba(11, 19, 43, 0.75) 65%, /* strong by lower area */
+    rgba(11, 19, 43, 1) 100%    /* full dark at bottom */
+  );
+  pointer-events: none;
+}
+
+
+
 
 /* --- Icon/Thumb sizing for bigger thumbnails --- */
 .fact-card {
@@ -1349,3 +1373,283 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+
+
+/* ===============================
+   BRIGHT SPOT TAKEOVER
+   =============================== */
+.brightspot-wrapper {
+  display: flex;
+  justify-content: center;   /* horizontally center child */
+  margin: 36px auto 28px;    /* tighten vertical spacing */
+  max-width: 640px;
+}
+
+
+
+
+/* --- Teaser Button --- */
+.brightspot-teaser {
+  position: relative;
+  display: inline-block;
+  font-size: 18px;
+  font-weight: 700; /* bump up weight for clarity */
+  padding: 16px 28px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #ffe7a3, #f6c86b, #d89b3d); /* calmer gold */
+  color: #fffdf6; /* soft warm white */
+  
+  /* stronger outline + shadow for contrast */
+  -webkit-text-stroke: 0.3px #000;      
+  text-shadow: 0 2px 5px rgba(0,0,0,0.9); 
+
+  border: none;
+  cursor: pointer;
+
+  /* upward + soft glow only */
+  box-shadow:
+    0 -20px 45px rgba(255, 210, 120, 0.55),  /* strong upward glow */
+    0 0 28px rgba(255, 190, 90, 0.35);       /* softer halo */
+
+  transition: transform .25s ease, box-shadow .25s ease, background .35s ease;
+  animation: floatPulse 3s ease-in-out infinite;
+}
+
+
+.brightspot-teaser:hover {
+  transform: translateY(-3px) scale(1.04);
+  background: linear-gradient(135deg, #fff0c2, #ffd480, #d89b3d); /* slightly brighter */
+  box-shadow:
+    0 -25px 55px rgba(255, 220, 140, 0.65),
+    0 0 36px rgba(255, 200, 100, 0.45);
+}
+
+
+
+
+@keyframes teaserPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+@keyframes glowShift {
+  0%   { box-shadow: 0 0 20px rgba(90, 255, 170, 0.6); }
+  50%  { box-shadow: 0 0 40px rgba(255, 255, 150, 0.9); }
+  100% { box-shadow: 0 0 20px rgba(90, 255, 170, 0.6); }
+}
+
+/* --- Fullscreen Takeover --- */
+/* Fullscreen Bright Spot */
+.brightspot-fullscreen {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(160deg, #0b132b 0%, #111a34 60%, #091020 100%);
+  backdrop-filter: blur(6px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.6s ease forwards;
+}
+
+/* ===============================
+   BRIGHTSPOT CARD
+   =============================== */
+
+.brightspot-content {
+  max-width: 720px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: clamp(16px, 3vw, 22px);
+  border-radius: 22px;
+  background:
+    radial-gradient(120% 120% at 0% 0%, rgba(255, 200, 80, .14), transparent 60%),
+    radial-gradient(120% 120% at 100% 100%, rgba(255, 150, 40, .20), transparent 60%),
+    linear-gradient(180deg, rgba(255, 255, 255, .05), rgba(255, 255, 255, .02));
+  border: 1px solid rgba(255, 190, 90, 0.25);
+  box-shadow: 0 10px 30px rgba(0,0,0,.38), inset 0 1px 0 rgba(255,255,255,.08);
+  animation: contentRise 0.6s ease forwards;
+  text-align: center;
+}
+
+.brightspot-image {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  border-radius: 14px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+}
+
+.brightspot-text {
+  margin: 0;
+  font-family: "Manrope", Inter, system-ui, sans-serif;
+  font-size: clamp(18px, 2.6vw, 22px);
+  line-height: 1.7;
+  color: #fff8e7; /* soft golden white */
+  -webkit-text-stroke: 0.2px black;
+  text-shadow: 2px 3px 20px rgba(0,0,0,0.9);
+}
+
+
+.brightspot-content p {
+  margin: 0;
+  font-family: "Manrope", Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: clamp(18px, 2.6vw, 22px);
+  line-height: 1.7;
+  color: #ffffff;
+  text-wrap: pretty;
+  -webkit-text-stroke: 0.2px black;
+  text-shadow: 2px 3px 44px rgba(0, 0, 0, 0.9);
+}
+
+
+.brightspot-source {
+  margin-top: 8px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.55); /* subtle muted */
+  text-align: center;
+  font-style: italic;
+}
+.brightspot-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: 12px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 20%, #ffd480, #d89b3d);
+  box-shadow: 0 0 28px rgba(255, 200, 100, .45);
+  font-size: 20px;
+  color: #fffdf6;
+  animation: badgeFloat 4s ease-in-out infinite;
+}
+@keyframes badgeFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+
+
+/* Navigation buttons */
+
+
+
+
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes contentRise {
+  from { opacity: 0; transform: translateY(40px) scale(0.9); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+
+
+
+
+@keyframes floatPulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: translateY(-5px) scale(1.03); }
+}
+
+
+
+
+/* Scope: Daily Summary page */
+.daily-summary {
+  position: relative;
+  padding-bottom: 0px;   /* enough breathing room but no giant gap */
+}
+
+
+/* Headlines container + gradual fade to darkness */
+.daily-summary .facts {
+  position: relative;
+  overflow: hidden;
+}
+.daily-summary .facts::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 520px;  /* keep tall so it overlaps enough */
+  background: linear-gradient(
+    to bottom,
+    rgba(11,19,43,0)   0%,    /* fully transparent top */
+    rgba(11,19,43,0.05) 20%,  /* fade begins lower */
+    rgba(11,19,43,0.30) 45%,  /* mid fade later */
+    rgba(11,19,43,0.70) 75%,  /* strong fade */
+    rgba(11,19,43,1)   100%   /* full darkness */
+  );
+  pointer-events: none;
+}
+
+
+
+/* Space the Bright Spot teaser away from the headlines */
+.daily-summary .brightspot-wrapper {
+  text-align: center;
+  margin: 44px auto;   /* evenly spaced above and below */
+  max-width: 640px;
+  position: relative;
+}
+
+
+
+.daily-summary .nav-buttons {
+  margin-top: 40px;      /* standard gap from headlines */
+  padding-bottom: 80px;  /* push nav arrow down so it clears the floating Bright Spot */
+}
+
+
+
+/* Force BrightSpot nav buttons to inherit Nightcap look */
+.brightspot-fullscreen .nav-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 760px;
+  margin: 40px auto 0;
+  padding: 0 6px;
+  position: relative;
+  z-index: 10; /* bring buttons above any overlays */
+}
+
+.brightspot-fullscreen .nav-btn {
+  appearance: none;
+  border: 1px solid rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.03);
+  color: var(--text);
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  font-size: 22px;
+  font-weight: 600;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  position: relative;
+  z-index: 10; /* ensure each button is clickable */
+  transition: transform .12s ease, background .18s ease, border-color .18s ease, box-shadow .18s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.04);
+}
+
+.brightspot-fullscreen .nav-btn.primary {
+  border-color: rgba(92,225,230,0.22);
+  color: rgba(92,225,230,0.98);
+  box-shadow: 0 6px 18px rgba(92,225,230,0.12), inset 0 1px 0 rgba(255,255,255,0.04);
+}
+
+.brightspot-fullscreen .nav-btn.primary svg {
+  filter: drop-shadow(0 0 0 rgba(92,225,230,0));
+  animation: svgGlow 3s ease-in-out infinite;
+}
+
+

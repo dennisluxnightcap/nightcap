@@ -56,7 +56,7 @@ export default function App() {
         >
           {step === "Summary" && (
             <div>
-              <DailySummary />
+              <DailySummary onNext={next} spot={daily.brightspot}/>
               <div style={{ marginTop: 16 }}>
                 <nav
                   className="nav-buttons"

@@ -1,6 +1,7 @@
 // utils/getStatic.ts
 import type { Breathing } from "@/types";
 import { stories } from "./storyPool";
+import { brightspots } from "./brightspotPool"; // ✅ new import
 
 // Helper: stable daily index
 function localISO(d: Date = new Date()) {
@@ -28,7 +29,7 @@ function pickByDate<T>(arr: T[], date: Date = new Date()): T {
 /** Types */
 type Fact = {
   text: string;
-  image?: string; // optional, so you can add images gradually
+  image?: string;
 };
 
 /** Fact pools */
@@ -65,7 +66,8 @@ export function getStaticContent(date: Date = new Date()) {
   return {
     feelGood: pickByDate(FEELGOOD, date),
     learn: pickByDate(LEARN, date),
-    story: pickByDate(stories, date), // ✅ stories are now { text, image }
+    story: pickByDate(stories, date),
     breathing: pickByDate(BREATHING, date),
+    brightspot: pickByDate(brightspots, date), // ✅ new
   };
 }

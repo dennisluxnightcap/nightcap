@@ -5,11 +5,11 @@
 export const stories = [
   {
     text: `In 2012, in Bangladesh, a group of schoolchildren were playing near a riverbank when a stray dog began barking wildly. Moments later, the children realized a cobra had slithered close to them in the grass. The dog leapt forward, barking and snapping until the snake retreated back into the reeds. The children were unharmed, and villagers later said the stray had followed them for days afterward, almost like a guardian. It became known as the “school dog,” and locals fed it daily as thanks for saving their children.`,
-    image: undefined,
+    image: "/images/bangladeshdog.png",
   },
   {
     text: `In 1996, a devastating flood hit the Czech town of Třeboň. When water levels rose, an elderly man was trapped in his small house. He assumed no one would come for him, until he saw a swan floating outside his window, tapping its beak on the glass. Curious, he followed the bird as it swam to higher ground, where rescuers were searching. The man was saved. For years after, he left bread for the swans every morning, calling them his “guides through the water.”`,
-    image: undefined,
+    image: "/images/czechswan.png",
   },
   {
     text: `In Japan’s 2011 earthquake and tsunami, a dog named Ban was found drifting on the roof of a destroyed house three kilometers out at sea. When rescuers finally pulled her onto a boat, she was weak but wagging her tail. The story spread across the country, and after days in a shelter she was joyfully reunited with her owner, who had been searching desperately. Ban became a symbol of resilience — the little dog who refused to give up, even when stranded in the ocean.`,
