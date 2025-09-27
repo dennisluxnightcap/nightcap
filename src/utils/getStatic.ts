@@ -1,7 +1,8 @@
 // utils/getStatic.ts
 import type { Breathing } from "@/types";
 import { stories } from "./storyPool";
-import { brightspots } from "./brightspotPool"; // ✅ new import
+import { brightspots } from "./brightspotPool";
+import { videos } from "./videoPool"; // ✅ new import
 
 // Helper: stable daily index
 function localISO(d: Date = new Date()) {
@@ -68,6 +69,7 @@ export function getStaticContent(date: Date = new Date()) {
     learn: pickByDate(LEARN, date),
     story: pickByDate(stories, date),
     breathing: pickByDate(BREATHING, date),
-    brightspot: pickByDate(brightspots, date), // ✅ new
+    brightspot: pickByDate(brightspots, date),
+    video: pickByDate(videos, date), // ✅ new
   };
 }

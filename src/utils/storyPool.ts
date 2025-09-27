@@ -21,7 +21,7 @@ export const stories = [
   },
   {
     text: `In New Zealand in 2014, a pod of dolphins surprised a group of swimmers by circling tightly around them. The swimmers were confused at first, until they noticed a great white shark lurking nearby. For more than forty minutes, the dolphins kept a protective ring until the shark drifted away. Marine biologists later confirmed this wasn’t the first time dolphins had shielded humans from danger, adding another chapter to the long history of dolphins acting as guardians of the sea.`,
-    image: undefined,
+    image: "/images/newzealanddolphins.png",
   },
   {
     text: `In 1945, in a small French village, an oak tree was struck by lightning. Locals assumed it was dead, but instead of cutting it down, they decorated its trunk with lanterns every Christmas. Strangely, the following spring, fresh leaves sprouted. The oak survived, becoming a symbol of endurance for the town. Generations later, it still stands, its bark blackened from the strike, but its canopy alive and green. Villagers tell their children it is the tree that refused to die.`,

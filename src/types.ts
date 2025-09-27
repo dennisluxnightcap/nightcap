@@ -25,11 +25,20 @@ export type Brightspot = Fact & {
   year?: number;
 };
 
+// ✅ New Video type
+export type Video = {
+  title: string;
+  url: string;
+  source?: string;
+  year?: number;
+};
+
 export type Daily = {
   summary: (string | SummaryItem)[];
   feelGood: Fact;
   learn: Fact;
   story: Fact;
   breathing: Breathing;
-  brightspot: Brightspot; // ✅ add here
+  brightspot: Brightspot;
+  video: Video; // ✅ added here
 };

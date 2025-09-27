@@ -1393,27 +1393,35 @@ body {
   position: relative;
   display: inline-block;
   font-size: 18px;
-  font-weight: 700; /* bump up weight for clarity */
+  font-weight: 700;
   padding: 16px 28px;
   border-radius: 18px;
-  background: linear-gradient(135deg, #ffe7a3, #f6c86b, #d89b3d); /* calmer gold */
-  color: #fffdf6; /* soft warm white */
-  
-  /* stronger outline + shadow for contrast */
-  -webkit-text-stroke: 0.3px #000;      
-  text-shadow: 0 2px 5px rgba(0,0,0,0.9); 
-
+  background: linear-gradient(135deg, #ffe7a3, #f6c86b, #d89b3d);
+  color: #fffdf6;
+  -webkit-text-stroke: 0.3px #000;
+  text-shadow: 0 2px 5px rgba(0,0,0,0.9);
   border: none;
   cursor: pointer;
 
-  /* upward + soft glow only */
   box-shadow:
-    0 -20px 45px rgba(255, 210, 120, 0.55),  /* strong upward glow */
-    0 0 28px rgba(255, 190, 90, 0.35);       /* softer halo */
+    0 -20px 45px rgba(255, 210, 120, 0.55),
+    0 0 28px rgba(255, 190, 90, 0.35);
 
-  transition: transform .25s ease, box-shadow .25s ease, background .35s ease;
-  animation: floatPulse 3s ease-in-out infinite;
+  /* entrance state */
+  opacity: 0;
+  transform: translateY(120%); /* 👈 start way below */
+  animation:
+    teaserFloatIn 15.6s cubic-bezier(.25, .8, .25, 1) forwards,
+    floatPulse 3s ease-in-out infinite 1.8s; /* pulse kicks in after */
 }
+
+@keyframes teaserFloatIn {
+  from { opacity: 0; transform: translateY(120%); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+
+
 
 
 .brightspot-teaser:hover {
@@ -1475,13 +1483,23 @@ body {
   text-align: center;
 }
 
+.brightspot-image-wrapper {
+  position: relative;
+  width: 100%;
+  height: 260px;       /* lock container height */
+  border-radius: 22px;
+  overflow: hidden;    /* 👈 keeps zoomed image inside */
+  box-shadow: 0 8px 28px rgba(0,0,0,0.45);
+}
+
 .brightspot-image {
   width: 100%;
-  max-height: 220px;
-  object-fit: cover;
-  border-radius: 14px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+  height: 100%;
+  object-fit: cover;   /* keeps aspect ratio */
+  filter: brightness(0.75);
 }
+
+
 
 .brightspot-text {
   margin: 0;
@@ -1507,12 +1525,14 @@ body {
 
 
 .brightspot-source {
-  margin-top: 8px;
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.55); /* subtle muted */
-  text-align: center;
+  margin-top: 6px;
+  font-size: 12px !important; /* 👈 smaller */
+  color: rgba(255, 255, 255, 0.45); /* 👈 slightly lighter */
   font-style: italic;
+  text-align: right;  /* 👈 push to the side */
+  width: 100%;        /* 👈 makes sure it hugs the container width */
 }
+
 .brightspot-badge {
   display: inline-flex;
   align-items: center;
@@ -1651,5 +1671,70 @@ body {
   filter: drop-shadow(0 0 0 rgba(92,225,230,0));
   animation: svgGlow 3s ease-in-out infinite;
 }
+
+
+/* ===============================
+   VIDEO CARD OVERRIDES (force priority)
+   =============================== */
+
+/* Accent text "Video" */
+.section-hero .video-accent {
+  background: linear-gradient(90deg, #7dcfff, #8bd3ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent !important;
+  font-weight: 400;
+}
+
+/* Badge bubble */
+.section-hero .video-badge {
+  background: radial-gradient(120% 120% at 30% 20%, #7dcfff 0%, #2b65ff 70%, #0a1a40 100%) !important;
+  box-shadow: 0 10px 28px rgba(125, 207, 255, 0.35) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #e7f6ff !important;
+}
+
+/* Caption */
+/* Video caption — match Story font */
+.video-wrapper .video-caption {
+  font-family: "Manrope", Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: clamp(16px, 2.4vw, 20px);
+  line-height: 1.6;
+  text-align: center;
+  margin-top: 10px;
+  color: #ffffff;
+  text-wrap: pretty;
+
+  /* match Story polish */
+  -webkit-text-stroke: 0.25px black;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+}
+
+
+/* ===============================
+   VIDEO FRAME STYLING
+   =============================== */
+.video-frame {
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45),
+              0 0 12px rgba(125, 207, 255, 0.25); /* subtle cyan glow */
+  transition: box-shadow 0.3s ease;
+}
+
+.video-frame:hover {
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.55),
+              0 0 18px rgba(125, 207, 255, 0.5); /* stronger on hover */
+}
+
+.video-frame iframe {
+  display: block;
+  width: 100%;
+  height: 220px;
+  border: none;
+}
+
 
 

@@ -1,6 +1,8 @@
 // src/components/BrightSpot.tsx
 import React, { useState } from "react";
 import type { Brightspot } from "../types";
+import { motion } from "framer-motion";
+
 import "../styles.css";
 
 export default function BrightSpot({
@@ -12,10 +14,7 @@ export default function BrightSpot({
 }) {
   const [open, setOpen] = useState(false);
 
-  // Back arrow → just close BrightSpot
   const handlePrev = () => setOpen(false);
-
-  // Forward arrow → close BrightSpot and advance
   const handleNext = () => {
     setOpen(false);
     onNext();
@@ -46,21 +45,52 @@ export default function BrightSpot({
       {open && (
         <div className="brightspot-fullscreen">
           <div className="brightspot-content">
-            <div className="brightspot-badge">🌞</div>
+            {/* Gradient badge with SVG sun */}
+            <div className="brightspot-badge">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                className="brightspot-icon"
+              >
+                <circle cx="12" cy="12" r="5" />
+                <line x1="12" y1="1" x2="12" y2="3" />
+                <line x1="12" y1="21" x2="12" y2="23" />
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                <line x1="1" y1="12" x2="3" y2="12" />
+                <line x1="21" y1="12" x2="23" y2="12" />
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+              </svg>
+            </div>
+
             {spot.image && (
-              <img src={spot.image} alt={spot.text} className="brightspot-image" />
-            )}
+  <div className="brightspot-image-wrapper">
+    <motion.img
+      src={spot.image}
+      alt={spot.text}
+      className="brightspot-image"
+      initial={{ scale: 1.05, y: 0 }}
+      animate={{ scale: 1.2, y: -40 }}   // zoom + drift
+      transition={{ duration: 30, ease: "linear", repeat: Infinity }}
+    />
+  </div>
+)}
+
+
             <p className="brightspot-text">{spot.text}</p>
             {spot.source && (
               <p className="brightspot-source">
-                Source: {spot.source} {spot.year ? `(${spot.year})` : ""}
+                {spot.source} {spot.year ? `(${spot.year})` : ""}
               </p>
             )}
           </div>
 
           {/* Navigation buttons */}
           <div className="nav-buttons">
-            {/* Left: back to DailySummary (close fullscreen) */}
             <button className="nav-btn primary" onClick={handlePrev}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -77,7 +107,6 @@ export default function BrightSpot({
               </svg>
             </button>
 
-            {/* Right: advance to FeelGoodFact */}
             <button className="nav-btn primary pulse" onClick={handleNext}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"

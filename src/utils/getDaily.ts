@@ -21,7 +21,7 @@ export async function getDaily(d: Date = new Date()): Promise<Daily> {
     learn: staticContent.learn,
     story: staticContent.story,
     breathing: staticContent.breathing,
-    brightspot: staticContent.brightspot, // ✅ included
+    brightspot: staticContent.brightspot,
+    video: staticContent.video, // ✅ added this
   };
 }
-
