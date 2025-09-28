@@ -1,19 +1,19 @@
 import React from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function FeelGoodFact({
   text,
   image,
   onNext,
   onPrev,
-}: { 
-  text: string; 
-  image?: string; 
-  onNext: () => void; 
-  onPrev?: () => void 
+}: {
+  text: string;
+  image?: string;
+  onNext: () => void;
+  onPrev?: () => void;
 }) {
   return (
-    <section>
+    <section className="beautiful">
       <div className="section-hero">
         <div className="badge">
           <svg
@@ -38,26 +38,40 @@ export default function FeelGoodFact({
       </div>
 
       <div className="bubble-card fact-content">
-  {image && (
-    <motion.img
-      src={image}
-      alt={text}
-      className="fact-image"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 1.5, ease: "easeOut" }}
-    />
-  )}
-  <motion.p
-    className="fact-text"
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    transition={{ duration: 2.5, ease: "easeOut", delay: 0.3 }}
-  >
-    {text}
-  </motion.p>
-</div>
+        <AnimatePresence mode="wait">
+          {image && (
+            <motion.img
+  key={image}
+  src={image}
+  alt={text}
+  className="fact-image"
+  initial={{ opacity: 0, scale: 1.05, y: 20 }}
+  animate={{
+    opacity: 1,
+    scale: [1, 1.03, 1],   // 👈 slightly stronger zoom
+    y: [0, -4, 0],         // 👈 slightly more drift
+  }}
+  transition={{
+    opacity: { duration: 1.2, ease: "easeOut" },
+    scale: { duration: 6, ease: "easeInOut", repeat: Infinity }, // was 10
+    y: { duration: 6, ease: "easeInOut", repeat: Infinity }      // was 10
+  }}
+/>
 
+          )}
+
+          <motion.p
+            key={text} // 👈 ensures re-mount when the text changes
+            className="fact-text"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
+          >
+            {text}
+          </motion.p>
+        </AnimatePresence>
+      </div>
 
       <div style={{ marginTop: 16 }}>
         <nav className="nav-buttons" aria-label="Card navigation">
@@ -68,7 +82,6 @@ export default function FeelGoodFact({
             disabled={!onPrev}
             title={onPrev ? "Back" : ""}
           >
-            {/* Back SVG */}
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -91,7 +104,6 @@ export default function FeelGoodFact({
             aria-label="Next"
             title="Next"
           >
-            {/* Forward SVG */}
             <svg
               viewBox="0 0 24 24"
               fill="none"

@@ -36,15 +36,25 @@ export default function LearnFact({
       <div className="bubble-card fact-content">
         {image && (
           <motion.img
+            key={image}
             src={image}
             alt={text}
             className="fact-image"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1.5, ease: "easeOut" }}
+            initial={{ opacity: 0, scale: 1.05, y: 20 }}
+            animate={{
+              opacity: 1,
+              scale: [1, 1.02, 1],   // subtle zoom
+              y: [0, -4, 0],         // gentle float
+            }}
+            transition={{
+              opacity: { duration: 1.2, ease: "easeOut" },
+              scale: { duration: 6, ease: "easeInOut", repeat: Infinity },
+              y: { duration: 6, ease: "easeInOut", repeat: Infinity }
+            }}
           />
         )}
         <motion.p
+          key={text}
           className="fact-text"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

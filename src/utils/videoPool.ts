@@ -13,6 +13,11 @@ export const videos = [
     year: 2022,
   },
   {
+    title: "27 Years To Walk Across The World",
+    url: "https://www.youtube.com/embed/mtXDt-TJht4?rel=0&modestbranding=1",
+    
+  },
+  {
     title: "World's Smallest Wild Dog",
     url: "https://www.youtube.com/embed/S9atRW1DgbQ?rel=0&modestbranding=1",
     source: "National Geographic",

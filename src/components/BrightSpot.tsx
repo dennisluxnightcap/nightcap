@@ -44,9 +44,9 @@ export default function BrightSpot({
       {/* Fullscreen takeover */}
       {open && (
         <div className="brightspot-fullscreen">
-          <div className="brightspot-content">
-            {/* Gradient badge with SVG sun */}
-            <div className="brightspot-badge">
+          {/* Section hero ABOVE the content */}
+          <div className="section-hero brightspot-hero">
+            <div className="badge brightspot-badge">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
@@ -66,22 +66,33 @@ export default function BrightSpot({
                 <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
               </svg>
             </div>
+            <h2 className="title">
+              Something <span className="accent brightspot-accent">Positive</span>
+            </h2>
+          </div>
 
+          {/* Card container */}
+          <div className="brightspot-content">
             {spot.image && (
-  <div className="brightspot-image-wrapper">
-    <motion.img
-      src={spot.image}
-      alt={spot.text}
-      className="brightspot-image"
-      initial={{ scale: 1.05, y: 0 }}
-      animate={{ scale: 1.2, y: -40 }}   // zoom + drift
-      transition={{ duration: 30, ease: "linear", repeat: Infinity }}
-    />
-  </div>
-)}
-
+              <div className="brightspot-image-wrapper">
+                <motion.img
+                  src={spot.image}
+                  alt={spot.text}
+                  className="brightspot-image"
+                  initial={{ scale: 1, y: 0 }}
+                  animate={{ scale: 1.2, y: 40 }}
+                  transition={{
+                    duration: 30,
+                    ease: "linear",
+                    repeat: Infinity,
+                    repeatType: "reverse",
+                  }}
+                />
+              </div>
+            )}
 
             <p className="brightspot-text">{spot.text}</p>
+
             {spot.source && (
               <p className="brightspot-source">
                 {spot.source} {spot.year ? `(${spot.year})` : ""}

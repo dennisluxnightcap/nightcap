@@ -29,7 +29,7 @@ export const stories = [
   },
   {
     text: `In Alaska in 1925, the town of Nome was struck by a deadly diphtheria outbreak. Medicine was hundreds of miles away, and blizzards blocked the trains. Mushers set out with sled dogs to relay the serum across the wilderness. The final leg was led by a husky named Balto, who guided his team through the stormy night. Exhausted but unwavering, they arrived with the life-saving medicine. Balto became a national hero, and a statue of him still stands in New York’s Central Park, honoring all the sled dogs who braved the journey.`,
-    image: undefined,
+    image: "/images/alaskanome.png",
   },
   {
     text: `In 2018, in India, a boy fell into a deep borewell and was trapped for hours. While rescue teams worked, a stray cow stood near the opening the entire time, refusing to leave. Villagers said it mooed whenever the boy called out, almost as if answering him. When the boy was finally pulled to safety, the cow licked his face before walking away. The family later said they believed the animal had stayed to comfort their son in the dark.`,

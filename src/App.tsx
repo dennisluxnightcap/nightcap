@@ -130,56 +130,9 @@ export default function App() {
           )}
 
           {step === "Mood" && (
-            <Card>
-              <MoodSlider onComplete={next} />
-              <div className="row" style={{ marginTop: 12 }}>
-                <nav className="nav-buttons" aria-label="Mood navigation">
-                  <button
-                    className="nav-btn primary"
-                    onClick={prev}
-                    aria-label="Back"
-                    title="Back"
-                  >
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      aria-hidden
-                    >
-                      <path
-                        d="M16 19L8 12l8-7"
-                        stroke="currentColor"
-                        strokeWidth="1.8"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </button>
-                  <button
-                    className="nav-btn primary pulse" // ✅ your original pulse preserved
-                    onClick={next}
-                    aria-label="Next"
-                    title="Next"
-                  >
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      aria-hidden
-                    >
-                      <path
-                        d="M8 5l8 7-8 7"
-                        stroke="currentColor"
-                        strokeWidth="1.8"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </button>
-                </nav>
-              </div>
-            </Card>
-          )}
+  <MoodSlider onNext={next} onPrev={maybePrev} />
+)}
+
 
           {step === "Breathe" && (
             <Card>

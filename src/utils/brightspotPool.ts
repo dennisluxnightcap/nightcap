@@ -13,12 +13,6 @@ export const brightspots = [
     year: 2024,
   },
   {
-    text: "In 2024, the world added nearly 600 gigawatts of solar — the biggest single-year jump ever.",
-    image: "/images/solar-record-2024.png",
-    source: "SolarPower Europe",
-    year: 2024,
-  },
-  {
     text: "For the first time, Europe got more electricity from the sun than from coal.",
     image: "/images/eu-solar-beats-coal.png",
     source: "Ember",
@@ -77,18 +71,6 @@ export const brightspots = [
     image: "/images/malaria-vaccine-rollout.png",
     source: "WHO / Gavi",
     year: 2025,
-  },
-  {
-    text: "Early results are promising — in Cameroon, districts using the new malaria vaccine are seeing fewer child deaths.",
-    image: "/images/malaria-impact.png",
-    source: "Gavi",
-    year: 2025,
-  },
-  {
-    text: "Doctors are using CRISPR to cure sickle-cell disease — patients who once lived in pain are now healthy.",
-    image: "/images/crispr-sicklecell.png",
-    source: "CUH / FDA",
-    year: 2024,
   },
   {
     text: "Thailand just legalized same-sex marriage — couples began tying the knot in January 2025.",

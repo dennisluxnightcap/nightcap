@@ -1320,14 +1320,13 @@ body {
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(6px);
+
+  flex-wrap: wrap; /* ✅ allow wrapping instead of distortion */
 }
 
 .mood-hero .title {
   margin-bottom: 32px; /* add more space under the question */
 }
-
-
-
 
 .mood-btn {
   background: none;
@@ -1336,13 +1335,18 @@ body {
   padding: 6px;
   border-radius: 50%;
   transition: transform 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+
+  flex: 1 1 auto;          /* ✅ let buttons shrink */
+  min-width: 44px;         /* ✅ maintain tap target */
+  display: flex;
+  justify-content: center;
 }
 
 .mood-btn.active {
   color: #ff4d4d;
   transform: scale(1.15);
   box-shadow: 0 0 12px rgba(255,77,77,0.6);
-  animation: moodPulse 1.6s ease-in-out infinite; /* 👈 add pulse */
+  animation: moodPulse 1.6s ease-in-out infinite; /* 👈 pulse */
 }
 
 @keyframes moodPulse {
@@ -1355,6 +1359,19 @@ body {
     box-shadow: 0 0 20px rgba(255,77,77,0.9);
   }
 }
+
+/* ✅ Mobile tweak: smaller icons */
+@media (max-width: 420px) {
+  .mood-row {
+    gap: 10px;
+    padding: 12px;
+  }
+  .mood-btn svg {
+    width: 32px !important;
+    height: 32px !important;
+  }
+}
+
 
 
 /* ===============================
@@ -1456,7 +1473,8 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;   /* 👈 instead of center */
+  padding-top: 10px;  
   z-index: 9999;
   animation: fadeIn 0.6s ease forwards;
 }
@@ -1468,7 +1486,7 @@ body {
 .brightspot-content {
   max-width: 720px;
   display: flex;
-  flex-direction: column;
+  flex-direction: column;   /* ✅ still stacked: image above, text below */
   align-items: center;
   gap: 16px;
   padding: clamp(16px, 3vw, 22px);
@@ -1486,26 +1504,23 @@ body {
 .brightspot-image-wrapper {
   position: relative;
   width: 100%;
-  height: 360px;   /* fixed height */
   border-radius: 22px;
   overflow: hidden;
+  box-shadow: 0 0 22px rgba(255, 200, 100, 0.35); /* 👈 soft glow behind image */
 }
 
 .brightspot-image {
+  display: block;
   width: 100%;
-  height: 100%;
-  object-fit: cover;        /* fills the card */
-  object-position: top;     /* 👈 anchor at the top */
+  height: auto;   /* ✅ keep aspect ratio */
+  border-radius: 22px;
   filter: brightness(0.75);
 }
 
-
-
-
-
-
 .brightspot-text {
   margin: 0;
+  padding-top: 14px;   /* 👈 create space above */
+  border-top: 1px solid rgba(255, 255, 255, 0.12); /* 👈 faint separator line */
   font-family: "Manrope", Inter, system-ui, sans-serif;
   font-size: clamp(18px, 2.6vw, 22px);
   line-height: 1.7;
@@ -1513,6 +1528,7 @@ body {
   -webkit-text-stroke: 0.2px black;
   text-shadow: 2px 3px 20px rgba(0,0,0,0.9);
 }
+
 
 
 .brightspot-content p {
@@ -1741,3 +1757,183 @@ body {
 
 
 
+/* ===============================
+   BRIGHTSPOT HERO OVERRIDES
+   =============================== */
+.brightspot-hero .badge {
+  background: radial-gradient(120% 120% at 30% 20%, #ffd480 0%, #ffb347 60%, #d89b3d 100%);
+  box-shadow: 0 10px 28px rgba(255, 200, 100, 0.45);
+  border: 1px solid rgba(255,255,255,.12);
+  color: #fff7e6;
+}
+
+.brightspot-hero .accent {
+  background: linear-gradient(90deg, #ffd480, #ffb347, #d89b3d);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-weight: 400;
+}
+
+/* Positioning + spacing for BrightSpot hero */
+.brightspot-hero {
+  text-align: center;
+  margin: 10px 0 32px; /* top margin = 10px, bottom margin = 32px */
+}
+
+
+
+
+.mood-history {
+  margin-top: 2.5rem;
+  padding-top: 1rem;
+  padding-bottom: 1.2rem;
+  text-align: center;
+  border-top: 1px solid rgba(255,255,255,0.08);   /* faint line above */
+  border-bottom: 1px solid rgba(255,255,255,0.08);/* faint line below */
+}
+
+.mood-history .history-label {
+  font-family: "Manrope", Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: clamp(16px, 2.6vw, 20px);
+  font-weight: 400;
+  color: #ffffff;
+  text-align: center;
+  margin-bottom: 1.6rem;
+
+  -webkit-text-stroke: 0.2px black;
+
+  text-shadow: 0 0 8px rgba(255, 77, 77, 0.55);
+
+  /* 👇 pulsating animation */
+  animation: textPulse 3s ease-in-out infinite;
+}
+
+@keyframes textPulse {
+  0%, 100% {
+    text-shadow:
+      0 0 6px rgba(255, 77, 77, 0.55),
+      0 0 18px rgba(255, 77, 77, 0.35);
+  }
+  50% {
+    text-shadow:
+      0 0 10px rgba(255, 77, 77, 0.75),
+      0 0 28px rgba(255, 77, 77, 0.45);
+  }
+}
+
+
+
+
+
+.history-row {
+  display: flex;
+  justify-content: center;
+  gap: 1.2rem; /* spacing between faces */
+  position: relative;
+}
+
+.history-face {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+/* 👇 vertical separator between faces */
+.history-face:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  right: -0.6rem;
+  top: 25%;
+  bottom: 25%;
+  width: 1px;
+  background: rgba(255,255,255,0.08); /* faint line */
+}
+
+.placeholder {
+  opacity: 0.25;
+  font-size: 1.2rem;
+}
+
+
+
+/* ===============================
+   VIDEO THEME (Calm blue gradient)
+   =============================== */
+.video-section .bubble-card {
+  background:
+    radial-gradient(120% 120% at 0% 0%, rgba(139, 211, 255, 0.25), transparent 65%),
+    radial-gradient(120% 120% at 100% 100%, rgba(179, 139, 255, 0.28), transparent 65%),
+    linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+  border: 1px solid rgba(139, 211, 255, 0.3);
+  box-shadow: 0 12px 34px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,255,255,.1);
+  padding: 28px 24px;
+  gap: 22px;
+}
+
+.video-section .video-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 22px; /* space between iframe and caption */
+}
+
+
+.video-section .video-caption {
+  margin: 0;
+  font-family: "Manrope", Inter, system-ui, sans-serif;
+  font-size: clamp(16px, 2.4vw, 20px);
+  line-height: 1.6;
+  text-align: center;
+  color: #ffffff;
+  -webkit-text-stroke: 0.25px black;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.8);
+}
+
+
+
+
+/* === Beautiful (Purple theme) === */
+.beautiful .section-hero .badge {
+  background: radial-gradient(120% 120% at 30% 20%, #ff8bd9 0%, #b38bff 60%, #2b0b40 100%);
+  box-shadow: 0 10px 28px rgba(179, 139, 255, .35);
+  border: 1px solid rgba(255,255,255,.12);
+  color: #ffd6f2;
+}
+
+.beautiful .section-hero .accent {
+  background: linear-gradient(90deg, #ff8bd9, #b38bff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.beautiful .bubble-card {
+  background:
+    radial-gradient(120% 120% at 0% 0%, rgba(255, 139, 217, .16), transparent 60%),
+    radial-gradient(120% 120% at 100% 100%, rgba(179, 139, 255, .22), transparent 60%),
+    linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+  border: 1px solid rgba(179, 139, 255, .25);
+  box-shadow: 0 10px 30px rgba(0,0,0,.38), inset 0 1px 0 rgba(255,255,255,.08);
+}
+
+
+
+.video-wrapper .video-caption {
+  margin: 0;
+  padding: 14px 0;
+  font-family: "Manrope", Inter, system-ui, sans-serif;
+  font-size: clamp(20px, 2.4vw, 26px);
+  line-height: 1.6;
+  text-align: center;
+  color: #ffffff;
+  text-wrap: pretty;
+
+  -webkit-text-stroke: 0.25px black;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+
+  border-top: 1px solid rgba(255, 255, 255, 0.12);  /* 👈 faint top line */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08); /* 👈 faint bottom line */
+}
