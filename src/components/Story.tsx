@@ -29,8 +29,8 @@ export default function Story({
             className="story-bg-img"
             style={{ backgroundImage: `url(${image})` }}
             initial={{ scale: 1.05, y: 0 }}
-            animate={{ scale: 1.2, y: -40 }} // 👈 zoom + drift upward (reveals bottom of image)
-            transition={{ duration: 30, ease: "linear", repeat: Infinity }}
+            animate={{ scale: 1.2, y: -80 }} // 👈 zoom + drift upward (reveals bottom of image)
+            transition={{ duration: 20, ease: "linear", repeat: Infinity }}
           />
         )}
 
