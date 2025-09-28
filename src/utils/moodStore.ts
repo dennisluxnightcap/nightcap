@@ -44,3 +44,11 @@ export function getTodayMood(): MoodLog | undefined {
   const today = localISO();
   return getMoodLogs().find((e) => e.date === today);
 }
+
+// ✅ NEW FUNCTION
+export function getYesterdayMood(): MoodLog | undefined {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  const yesterday = localISO(d);
+  return getMoodLogs().find((e) => e.date === yesterday);
+}

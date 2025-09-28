@@ -1486,18 +1486,21 @@ body {
 .brightspot-image-wrapper {
   position: relative;
   width: 100%;
-  height: 260px;       /* lock container height */
+  height: 360px;   /* fixed height */
   border-radius: 22px;
-  overflow: hidden;    /* 👈 keeps zoomed image inside */
-  box-shadow: 0 8px 28px rgba(0,0,0,0.45);
+  overflow: hidden;
 }
 
 .brightspot-image {
   width: 100%;
   height: 100%;
-  object-fit: cover;   /* keeps aspect ratio */
+  object-fit: cover;        /* fills the card */
+  object-position: top;     /* 👈 anchor at the top */
   filter: brightness(0.75);
 }
+
+
+
 
 
 

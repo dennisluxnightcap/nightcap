@@ -25,7 +25,7 @@ export const stories = [
   },
   {
     text: `In 1945, in a small French village, an oak tree was struck by lightning. Locals assumed it was dead, but instead of cutting it down, they decorated its trunk with lanterns every Christmas. Strangely, the following spring, fresh leaves sprouted. The oak survived, becoming a symbol of endurance for the town. Generations later, it still stands, its bark blackened from the strike, but its canopy alive and green. Villagers tell their children it is the tree that refused to die.`,
-    image: undefined,
+    image: "/images/frenchvillage.png",
   },
   {
     text: `In Alaska in 1925, the town of Nome was struck by a deadly diphtheria outbreak. Medicine was hundreds of miles away, and blizzards blocked the trains. Mushers set out with sled dogs to relay the serum across the wilderness. The final leg was led by a husky named Balto, who guided his team through the stormy night. Exhausted but unwavering, they arrived with the life-saving medicine. Balto became a national hero, and a statue of him still stands in New York’s Central Park, honoring all the sled dogs who braved the journey.`,

@@ -1,54 +1,6 @@
 // src/components/MoodSlider.tsx
 import React, { useEffect, useMemo, useState } from "react";
-import { saveMoodForDate, getTodayMood, type MoodValue } from "../utils/moodStore";
-
-type MoodEntry = { mood: MoodValue } | null;
-
-/** Find yesterday's mood directly from localStorage without relying on moodStore exports. */
-function getYesterdayMoodFromStorage(): MoodEntry {
-  if (typeof window === "undefined") return null; // SSR guard
-  try {
-    const d = new Date();
-    d.setDate(d.getDate() - 1);
-    const iso = d.toISOString().slice(0, 10); // YYYY-MM-DD
-
-    // 1) Try the common key pattern first: mood-YYYY-MM-DD
-    const direct = localStorage.getItem(`mood-${iso}`);
-    if (direct) {
-      try {
-        const parsed = JSON.parse(direct);
-        if (parsed && typeof parsed === "object" && "mood" in parsed) return parsed as MoodEntry;
-        // some stores might save just a number
-        const asNum = Number(direct);
-        if (!Number.isNaN(asNum)) return { mood: asNum as MoodValue };
-      } catch {
-        const asNum = Number(direct);
-        if (!Number.isNaN(asNum)) return { mood: asNum as MoodValue };
-      }
-    }
-
-    // 2) Fallback: scan all keys for something that includes the date and looks like a mood entry
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i) || "";
-      if (/mood/i.test(key) && key.includes(iso)) {
-        const raw = localStorage.getItem(key);
-        if (!raw) continue;
-        try {
-          const parsed = JSON.parse(raw);
-          if (parsed && typeof parsed === "object" && "mood" in parsed) return parsed as MoodEntry;
-          const asNum = Number(raw);
-          if (!Number.isNaN(asNum)) return { mood: asNum as MoodValue };
-        } catch {
-          const asNum = Number(raw);
-          if (!Number.isNaN(asNum)) return { mood: asNum as MoodValue };
-        }
-      }
-    }
-  } catch {
-    /* ignore */
-  }
-  return null;
-}
+import { saveMoodForDate, getTodayMood, getYesterdayMood, type MoodValue } from "../utils/moodStore";
 
 /* --- Inline SVG icons --- */
 function Face({ kind, active }: { kind: MoodValue; active: boolean }) {
@@ -104,7 +56,6 @@ export default function MoodSlider({
   useEffect(() => {
     saveMoodForDate(value);
   }, [value]);
-  
 
   // Subtle glow depending on mood
   const glow = useMemo(
@@ -112,14 +63,13 @@ export default function MoodSlider({
     [value]
   );
 
-  // Yesterday’s mood (client only)
-  const yesterdayMood = useMemo(getYesterdayMoodFromStorage, []);
+  // ✅ Yesterday’s mood via moodStore
+  const yesterdayMood = getYesterdayMood();
 
   return (
     <section>
       <header className="section-hero mood-hero">
         <div className="badge">
-          {/* Polished neon-outline badge icon */}
           <svg
             viewBox="0 0 48 48"
             xmlns="http://www.w3.org/2000/svg"
