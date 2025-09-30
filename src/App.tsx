@@ -14,7 +14,16 @@ import VideoCard from "./components/VideoCard"; // ✅ new import
 import { motion, AnimatePresence } from "framer-motion";
 
 // ✅ Steps (Video added between Story and Mood)
-const steps = ["Summary", "Feel-good", "Learn", "History", "Story", "Video", "Mood", "Breathe"] as const;
+const steps = [
+  "Summary",
+  "Feel-good",
+  "Learn",
+  "History",
+  "Story",
+  "Video",
+  "Mood",
+  "Breathe",
+] as const;
 type Step = (typeof steps)[number];
 
 export default function App() {
@@ -26,6 +35,11 @@ export default function App() {
   useEffect(() => {
     getDaily().then(setDaily);
   }, []);
+
+  // ✅ Reset scroll immediately on step change
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+  }, [stepIndex]);
 
   if (!daily) return <div className="shell">Loading…</div>;
 
@@ -46,7 +60,13 @@ export default function App() {
     <main className="shell">
       <header className="top"></header>
 
-      <AnimatePresence mode="wait">
+      <AnimatePresence
+        mode="wait"
+        // ✅ Run scroll reset again once exit animation completes
+        onExitComplete={() => {
+          window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+        }}
+      >
         <motion.div
           key={step}
           className="motion-page"
@@ -130,9 +150,8 @@ export default function App() {
           )}
 
           {step === "Mood" && (
-  <MoodSlider onNext={next} onPrev={maybePrev} />
-)}
-
+            <MoodSlider onNext={next} onPrev={maybePrev} />
+          )}
 
           {step === "Breathe" && (
             <Card>
