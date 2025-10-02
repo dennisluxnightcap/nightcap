@@ -35,30 +35,30 @@ type Fact = {
 
 /** Fact pools */
 const FEELGOOD: Fact[] = [
-  { text: "Cows form close friendships and get stressed when separated.", image: "/images/cows.png" },
-  { text: "Elephants can recognize themselves in mirrors — a sign of self-awareness.", image: "/images/elephants.png" },
-  { text: "Bees can remember and recognize human faces.", image: "/images/bees.png" },
-  { text: "Every dog’s nose print is unique, like a fingerprint.", image: "/images/dognose.png" },
-  { text: "Humpback whales create songs that spread across oceans.", image: "/images/whales.png" },
-  { text: "Penguins offer pebbles as gifts when choosing a mate.", image: "/images/penguins.png" },
-  { text: "Sea otters hold hands while they sleep to avoid drifting apart.", image: "/images/otters.png" },
-  { text: "Trees can communicate through underground fungal networks.", image: "/images/trees.png" },
-  { text: "Rats and mice laugh when tickled, though humans can’t hear it.", image: "/images/rats.png" },
-  { text: "Butterflies taste with their feet.", image: "/images/butterflies.png" },
+  { text: "Cows form close friendships and get stressed when separated", image: "/images/cows.png" },
+  { text: "Elephants can recognize themselves in mirrors — a sign of self-awareness", image: "/images/elephants.png" },
+  { text: "Bees can remember and recognize human faces", image: "/images/bees.png" },
+  { text: "Every dog’s nose print is unique, like a fingerprint", image: "/images/dognose.png" },
+  { text: "Humpback whales create songs that spread across oceans", image: "/images/whales.png" },
+  { text: "Penguins offer pebbles as gifts when choosing a mate", image: "/images/penguins.png" },
+  { text: "Sea otters hold hands while they sleep to avoid drifting apart", image: "/images/otters.png" },
+  { text: "Trees can communicate through underground fungal networks", image: "/images/trees.png" },
+  { text: "Rats and mice laugh when tickled, though humans can’t hear it", image: "/images/rats.png" },
+  { text: "Butterflies taste with their feet", image: "/images/butterflies.png" },
 ];
 
 
 const LEARN: Fact[] = [
-  { text: "Sharks have existed for over 400 million years — older than trees.", image: "/images/sharks.png" },
-  { text: "Bananas are technically berries, but strawberries aren’t.", image: "/images/bananas.png" },
-  { text: "Octopuses have three hearts and blue blood; two hearts stop when they swim.", image: "/images/octopus.png" },
-  { text: "Water can boil and freeze at the same time at its triple point.", image: "/images/water.png" },
-  { text: "The Eiffel Tower can grow about 15 cm taller in summer heat as the metal expands.", image: "/images/eiffel.png" },
-  { text: "Honey never spoils when sealed — jars thousands of years old are still edible.", image: "/images/honey.png" },
-  { text: "Your stomach gets a new lining every 3–4 days to prevent it from digesting itself.", image: "/images/stomach.png" },
-  { text: "If you could fold a piece of paper 42 times, it would reach the Moon.", image: "/images/paper.png" },
-  { text: "Glass is a slow-flowing liquid — old windows are thicker at the bottom.", image: "/images/glass.png" },
-  { text: "Wombat poop is cube-shaped so it doesn’t roll away.", image: "/images/wombat.png" },
+  { text: "Sharks have existed for over 400 million years — older than trees", image: "/images/sharks.png" },
+  { text: "Bananas are technically berries, but strawberries aren’t", image: "/images/bananas.png" },
+  { text: "Octopuses have three hearts and blue blood; two hearts stop when they swim", image: "/images/octopus.png" },
+  { text: "Water can boil and freeze at the same time at its triple point", image: "/images/water.png" },
+  { text: "The Eiffel Tower can grow about 15 cm taller in summer heat as the metal expands", image: "/images/eiffel.png" },
+  { text: "Honey never spoils when sealed — jars thousands of years old are still edible", image: "/images/honey.png" },
+  { text: "Your stomach gets a new lining every 3–4 days to prevent it from digesting itself", image: "/images/stomach.png" },
+  { text: "If you could fold a piece of paper 42 times, it would reach the Moon", image: "/images/paper.png" },
+  { text: "Glass is a slow-flowing liquid — old windows are thicker at the bottom", image: "/images/glass.png" },
+  { text: "Wombat poop is cube-shaped so it doesn’t roll away", image: "/images/wombat.png" },
 ];
 
 
