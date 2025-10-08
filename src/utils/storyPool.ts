@@ -51,10 +51,6 @@ export const stories = [
     image: "/images/maryceleste.png",
   },
   {
-    text: `In 1919, a storage tank in Boston’s North End burst, sending a wave of sticky molasses rushing through the streets. The wave was 25 feet high, moving at 35 miles per hour. Buildings crumpled, horses drowned, and 21 people were killed. Witnesses said the air smelled sweet for weeks, but the cleanup took years. Locals called it the “Great Molasses Flood,” and even a century later, some swear the pavement still turns tacky on hot summer days.`,
-    image: "/images/molasses.png",
-  },
-  {
     text: `In 1845, Sir John Franklin led two ships—the Erebus and the Terror—into the Arctic, searching for the Northwest Passage. They never returned. Years later, searchers found the ships trapped in ice, abandoned with supplies still aboard. Skeletons showed signs of starvation, hypothermia, even cannibalism. Inuit stories spoke of desperate men wandering the ice. For 150 years the ships’ fate was unknown, until modern sonar finally located their wrecks on the seafloor. But Franklin’s body was never found.`,
     image: "/images/franklin.png",
   },

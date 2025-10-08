@@ -9,6 +9,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@capacitor/android": "^7.4.3",
+    "@capacitor/cli": "^7.4.3",
+    "@capacitor/core": "^7.4.3",
     "cheerio": "^1.1.2",
     "fast-xml-parser": "^5.2.5",
     "framer-motion": "^12.23.12",

@@ -1,8 +1,7 @@
 // src/components/BrightSpot.tsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import type { Brightspot } from "../types";
 import { motion } from "framer-motion";
-
 import "../styles.css";
 
 export default function BrightSpot({
@@ -13,6 +12,13 @@ export default function BrightSpot({
   onNext: () => void;
 }) {
   const [open, setOpen] = useState(false);
+
+  // ✅ Reset scroll to top whenever BrightSpot opens
+  useEffect(() => {
+    if (open) {
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    }
+  }, [open]);
 
   const handlePrev = () => setOpen(false);
   const handleNext = () => {
