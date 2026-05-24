@@ -18,27 +18,9 @@ export default function HeadlineCard({ n = 5 }: { n?: number }) {
       try {
         setErr(null);
 
-        const key = "M03lo3mDZHrtPmCyN8wm43gAWt7IDqIZj4LTrlUnkNHtFn78";
-        const data = await fetch(
-          `https://api.nytimes.com/svc/topstories/v2/home.json?api-key=${key}`
-        ).then(r => r.ok ? r.json() : { results: [] });
+        const data = await fetch("/api/apnews").then(r => r.ok ? r.json() : { articles: [] });
 
-        const junkPattern = /newsletter|subscribe|sign up|sign-up|quiz|crossword|wordle|podcast/i;
-
-        const articles: NewsItem[] = (Array.isArray(data.results) ? data.results : [])
-          .filter((a: any) =>
-            a.title &&
-            a.url &&
-            a.item_type === "Article" &&
-            !junkPattern.test(a.title)
-          )
-          .slice(0, n)
-          .map((a: any) => ({
-            title: a.title || "",
-            url: a.url || "",
-            image: a.multimedia?.[0]?.url || null,
-            publishedAt: a.published_date || "",
-          }));
+        const articles: NewsItem[] = (data.articles || []).slice(0, n);
 
         if (!cancelled) setItems(articles);
       } catch (e: any) {
