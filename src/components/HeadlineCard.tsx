@@ -18,9 +18,37 @@ export default function HeadlineCard({ n = 5 }: { n?: number }) {
       try {
         setErr(null);
 
-        const data = await fetch("/api/apnews").then(r => r.ok ? r.json() : { articles: [] });
+        const key = "M03lo3mDZHrtPmCyN8wm43gAWt7IDqIZj4LTrlUnkNHtFn78";
+        const data = await fetch(
+          `https://api.nytimes.com/svc/topstories/v2/home.json?api-key=${key}`
+        ).then(r => r.ok ? r.json() : { results: [] });
 
-        const articles: NewsItem[] = (data.articles || []).slice(0, n);
+        const junkPattern = /newsletter|subscribe|sign up|sign-up|quiz|crossword|wordle|podcast/i;
+        const seenTopics = new Set<string>();
+
+        const articles: NewsItem[] = [];
+        for (const a of (data.results || [])) {
+          if (!a.title || !a.url || a.item_type !== "Article") continue;
+          if (junkPattern.test(a.title)) continue;
+
+          const facets: string[] = [
+            ...(a.des_facet || []),
+            ...(a.geo_facet || []),
+          ];
+
+          const isDuplicate = facets.some(f => seenTopics.has(f));
+          if (isDuplicate) continue;
+
+          facets.forEach(f => seenTopics.add(f));
+          articles.push({
+            title: a.title,
+            url: a.url,
+            image: a.multimedia?.[0]?.url || null,
+            publishedAt: a.published_date || "",
+          });
+
+          if (articles.length >= n) break;
+        }
 
         if (!cancelled) setItems(articles);
       } catch (e: any) {
