@@ -88,7 +88,9 @@ export default async function handler(req, res) {
       publishedAt: a?.webPublicationDate || "",
     }));
 
-    const out = dedupe(base, RETURN_N, wantImages);
+    // Try with images first, fall back to no-image requirement if empty
+    let out = dedupe(base, RETURN_N, wantImages);
+    if (out.length === 0 && wantImages) out = dedupe(base, RETURN_N, false);
     LAST_OK = globalThis._DAILYNEWS_CACHE = { ts: Date.now(), items: out };
 
     res.setHeader("Access-Control-Allow-Origin", "*");
@@ -96,6 +98,6 @@ export default async function handler(req, res) {
   } catch (e) {
     console.error("dailyNews error:", e);
     res.setHeader("Access-Control-Allow-Origin", "*");
-    res.status(200).json({ items: [] });
+    res.status(200).json({ items: [], error: e.message });
   }
 }
