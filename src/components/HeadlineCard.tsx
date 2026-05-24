@@ -19,32 +19,33 @@ export default function HeadlineCard({ n = 5 }: { n?: number }) {
         setErr(null);
 
         const key = "M03lo3mDZHrtPmCyN8wm43gAWt7IDqIZj4LTrlUnkNHtFn78";
-        const sections = ["world", "technology", "science", "sports", "business"];
+        const sectionQuotas: [string, number][] = [
+          ["world", 2],
+          ["technology", 1],
+          ["science", 1],
+          ["sports", 1],
+        ];
         const responses = await Promise.all(
-          sections.map(s =>
+          sectionQuotas.map(([s]) =>
             fetch(`https://api.nytimes.com/svc/topstories/v2/${s}.json?api-key=${key}`)
               .then(r => r.ok ? r.json() : { results: [] })
               .catch(() => ({ results: [] }))
           )
         );
 
-        const seen = new Set<string>();
-        const raw = responses.flatMap(d => Array.isArray(d.results) ? d.results : []);
-
-        const articles: NewsItem[] = raw
-          .filter((a: any) => {
-            if (!a.title || !a.url) return false;
-            if (seen.has(a.title)) return false;
-            seen.add(a.title);
-            return true;
-          })
-          .map((a: any) => ({
-            title: a.title || "",
-            url: a.url || "",
-            image: a.multimedia?.[0]?.url || null,
-            publishedAt: a.published_date || "",
-          }))
-          .slice(0, n);
+        const articles: NewsItem[] = responses.flatMap((d, i) => {
+          const quota = sectionQuotas[i][1];
+          const results = Array.isArray(d.results) ? d.results : [];
+          return results
+            .filter((a: any) => a.title && a.url)
+            .slice(0, quota)
+            .map((a: any) => ({
+              title: a.title || "",
+              url: a.url || "",
+              image: a.multimedia?.[0]?.url || null,
+              publishedAt: a.published_date || "",
+            }));
+        });
 
         if (!cancelled) setItems(articles);
       } catch (e: any) {
