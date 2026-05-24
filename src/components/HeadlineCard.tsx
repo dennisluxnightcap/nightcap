@@ -18,19 +18,25 @@ export default function HeadlineCard({ n = 5 }: { n?: number }) {
       try {
         setErr(null);
 
-        // All builds (web + Android) now use the same Vercel endpoint
-        const url = `https://nightcap-eta.vercel.app/api/dailyNews?n=${n}&image=1`;
+        const key = "6047c790-a24b-4dc3-9a9b-ab9fb70f0208";
+        const url = `https://content.guardianapis.com/search?api-key=${key}&section=world&show-fields=thumbnail&order-by=newest&page-size=50`;
 
         const r = await fetch(url, { headers: { Accept: "application/json" } });
-        if (!r.ok) throw new Error(await r.text());
+        if (!r.ok) throw new Error(`Guardian ${r.status}`);
         const data = await r.json();
 
-        // Normalize the response shape
-        const articles = Array.isArray(data.items)
-          ? data.items
-          : Array.isArray(data.articles)
-          ? data.articles
-          : [];
+        const raw = Array.isArray(data?.response?.results) ? data.response.results : [];
+
+        // Filter out liveblogs, map to NewsItem shape
+        const articles: NewsItem[] = raw
+          .filter((a: any) => a.type !== "liveblog")
+          .map((a: any) => ({
+            title: a.webTitle || "",
+            url: a.webUrl || "",
+            image: a.fields?.thumbnail || null,
+            publishedAt: a.webPublicationDate || "",
+          }))
+          .slice(0, n);
 
         if (!cancelled) setItems(articles);
       } catch (e: any) {
