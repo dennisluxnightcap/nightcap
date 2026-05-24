@@ -3,11 +3,13 @@ import { motion, AnimatePresence } from "framer-motion";
 
 export default function FeelGoodFact({
   text,
+  sub,
   image,
   onNext,
   onPrev,
 }: {
   text: string;
+  sub?: string;
   image?: string;
   onNext: () => void;
   onPrev?: () => void;
@@ -31,7 +33,6 @@ export default function FeelGoodFact({
             />
           </svg>
         </div>
-
         <h2 className="title">
           Something <span className="accent">Beautiful</span>
         </h2>
@@ -41,35 +42,48 @@ export default function FeelGoodFact({
         <AnimatePresence mode="wait">
           {image && (
             <motion.img
-  key={image}
-  src={image}
-  alt={text}
-  className="fact-image"
-  initial={{ opacity: 0, scale: 1.05, y: 20 }}
-  animate={{
-    opacity: 1,
-    scale: [1, 1.03, 1],   // 👈 slightly stronger zoom
-    y: [0, -4, 0],         // 👈 slightly more drift
-  }}
-  transition={{
-    opacity: { duration: 1.2, ease: "easeOut" },
-    scale: { duration: 6, ease: "easeInOut", repeat: Infinity }, // was 10
-    y: { duration: 6, ease: "easeInOut", repeat: Infinity }      // was 10
-  }}
-/>
-
+              key={image}
+              src={image}
+              alt={text}
+              className="fact-image"
+              initial={{ opacity: 0, scale: 1.05, y: 20 }}
+              animate={{
+                opacity: 1,
+                scale: [1, 1.03, 1],
+                y: [0, -4, 0],
+              }}
+              transition={{
+                opacity: { duration: 1.2, ease: "easeOut" },
+                scale: { duration: 6, ease: "easeInOut", repeat: Infinity },
+                y: { duration: 6, ease: "easeInOut", repeat: Infinity },
+              }}
+            />
           )}
 
-          <motion.p
-            key={text} // 👈 ensures re-mount when the text changes
-            className="fact-text"
-            initial={{ opacity: 0, y: 20 }}
+          <motion.div
+            key={text}
+            initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
+            transition={{ duration: 1.8, ease: [0.16, 1, 0.3, 1] }}
+            className="fact-block"
           >
-            {text}
-          </motion.p>
+            <p className="fact-main">{text}</p>
+
+            {sub && (
+              <>
+                <div className="fact-divider" />
+                <motion.p
+                  className="fact-sub"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.8, duration: 1.5, ease: "easeOut" }}
+                >
+                  {sub}
+                </motion.p>
+              </>
+            )}
+          </motion.div>
         </AnimatePresence>
       </div>
 

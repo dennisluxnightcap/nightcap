@@ -1,16 +1,18 @@
 import React from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function LearnFact({
   text,
+  sub,
   image,
   onNext,
   onPrev,
 }: { 
-  text: string; 
-  image?: string; 
-  onNext: () => void; 
-  onPrev?: () => void 
+  text: string;
+  sub?: string; // ✅ added
+  image?: string;
+  onNext: () => void;
+  onPrev?: () => void;
 }) {
   return (
     <section className="learn">
@@ -34,34 +36,55 @@ export default function LearnFact({
       </div>
 
       <div className="bubble-card fact-content">
-        {image && (
-          <motion.img
-            key={image}
-            src={image}
-            alt={text}
-            className="fact-image"
-            initial={{ opacity: 0, scale: 1.05, y: 20 }}
-            animate={{
-              opacity: 1,
-              scale: [1, 1.02, 1],   // subtle zoom
-              y: [0, -4, 0],         // gentle float
-            }}
+        <AnimatePresence mode="wait">
+          {image && (
+            <motion.img
+              key={image}
+              src={image}
+              alt={text}
+              className="fact-image"
+              initial={{ opacity: 0, scale: 1.05, y: 20 }}
+              animate={{
+                opacity: 1,
+                scale: [1, 1.02, 1],
+                y: [0, -4, 0],
+              }}
+              transition={{
+                opacity: { duration: 1.4, ease: "easeOut" },
+                scale: { duration: 6, ease: "easeInOut", repeat: Infinity },
+                y: { duration: 6, ease: "easeInOut", repeat: Infinity },
+              }}
+            />
+          )}
+
+          <motion.div
+            key={text}
+            className="fact-block"
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
             transition={{
-              opacity: { duration: 1.2, ease: "easeOut" },
-              scale: { duration: 6, ease: "easeInOut", repeat: Infinity },
-              y: { duration: 6, ease: "easeInOut", repeat: Infinity }
+              duration: 1.8,
+              ease: [0.16, 1, 0.3, 1],
             }}
-          />
-        )}
-        <motion.p
-          key={text}
-          className="fact-text"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 2.5, ease: "easeOut", delay: 0.3 }}
-        >
-          {text}
-        </motion.p>
+          >
+            <p className="fact-main">{text}</p>
+
+            {sub && (
+              <>
+                <div className="fact-divider" />
+                <motion.p
+                  className="fact-sub"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3, duration: 1.0, ease: "easeOut" }}
+                >
+                  {sub}
+                </motion.p>
+              </>
+            )}
+          </motion.div>
+        </AnimatePresence>
       </div>
 
       <div style={{ marginTop: 16 }}>

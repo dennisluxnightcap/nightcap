@@ -1,9 +1,8 @@
-// /api/dailyNews.js
+// /api/dailyNews.js — Guardian API
 
-const RETURN_N_DEFAULT = 5; // how many headlines to return
-const DEFAULT_TTL_HOURS = 6; // cache for 6h (GNews free-tier friendly)
+const RETURN_N_DEFAULT = 5;
+const DEFAULT_TTL_HOURS = 6;
 
-// keep memory cache across requests
 globalThis._DAILYNEWS_CACHE = globalThis._DAILYNEWS_CACHE || { ts: 0, items: [] };
 let LAST_OK = globalThis._DAILYNEWS_CACHE;
 
@@ -26,20 +25,6 @@ function normalizeTitle(t = "") {
   return t.toLowerCase().replace(/[^a-z0-9\s]/g, "").replace(/\s+/g, " ").trim();
 }
 
-/* ---------- blacklist ---------- */
-const BLACKLIST = ["dailymail.co.uk", "mailonline.com"];
-
-function isBlacklisted(url) {
-  try {
-    const host = new URL(url).hostname.toLowerCase();
-    if (/\.(ie)$/.test(host)) return true; // block .ie domains
-    return BLACKLIST.some(bad => host.includes(bad));
-  } catch {
-    return false;
-  }
-}
-
-/* ---------- dedupe ---------- */
 function titleSimilarity(a, b) {
   const wa = normalizeTitle(a).split(" ");
   const wb = normalizeTitle(b).split(" ");
@@ -55,7 +40,6 @@ function dedupe(arr, limit, requireImage) {
   for (const a of arr) {
     if (!a?.title || !a?.url) continue;
     if (requireImage && !a.image) continue;
-    if (isBlacklisted(a.url)) continue;
     if (out.some(b => titleSimilarity(a.title, b.title) >= 0.65)) continue;
     out.push(a);
     if (out.length >= limit) break;
@@ -63,25 +47,24 @@ function dedupe(arr, limit, requireImage) {
   return out;
 }
 
-/* ---------- build GNews URL ---------- */
-function buildGNewsURL(key) {
-  const u = new URL("https://gnews.io/api/v4/top-headlines");
-  u.searchParams.set("token", key);
-  u.searchParams.set("lang", "en");
-  u.searchParams.set("topic", "world");
-  u.searchParams.set("max", "15"); // fetch extra to allow for dedupe
+function buildGuardianURL(key) {
+  const u = new URL("https://content.guardianapis.com/search");
+  u.searchParams.set("api-key", key);
+  u.searchParams.set("section", "world,science,technology,environment,global-development");
+  u.searchParams.set("show-fields", "thumbnail,trailText");
+  u.searchParams.set("order-by", "newest");
+  u.searchParams.set("page-size", "50");          // fetch lots so we have room to filter
   return u.toString();
 }
 
 /* ---------- main handler ---------- */
 export default async function handler(req, res) {
-  const KEY = process.env.GNEWS_KEY || "d98739eb9b8ac50f63d3df46060dc55e";
+  const KEY = process.env.GUARDIAN_KEY || "6047c790-a24b-4dc3-9a9b-ab9fb70f0208";
   const RETURN_N = Math.max(1, Number(req.query.n || RETURN_N_DEFAULT));
   const wantImages = req.query.image === "1";
   const ttlHours = Number(process.env.NEWS_TTL_HOURS || DEFAULT_TTL_HOURS);
   const TTL_MS = ttlHours * 60 * 60 * 1000;
 
-  // use cache if still fresh
   if (Date.now() - LAST_OK.ts < TTL_MS && LAST_OK.items.length) {
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("x-cache", "mem-hit");
@@ -89,17 +72,24 @@ export default async function handler(req, res) {
   }
 
   try {
-    const r = await fetch(buildGNewsURL(KEY));
-    if (!r.ok) throw new Error(`GNews returned ${r.status}`);
+    const r = await fetch(buildGuardianURL(KEY));
+    if (!r.ok) throw new Error(`Guardian returned ${r.status}`);
 
     const j = await r.json();
-    const raw = Array.isArray(j?.articles) ? j.articles : [];
+    const raw = Array.isArray(j?.response?.results) ? j.response.results : [];
 
-    const base = raw.map(a => ({
-      title: sanitizeTextForUI(a?.title || ""),
-      url: a?.url || "",
-      image: a?.image || null,
-      publishedAt: a?.publishedAt || "",
+    // Only keep major global sections, no liveblogs
+    const GLOBAL_SECTIONS = new Set(["world", "science", "technology", "environment", "global-development"]);
+    const filtered = raw.filter(a =>
+      a.type !== "liveblog" &&
+      GLOBAL_SECTIONS.has(a.sectionId)
+    );
+
+    const base = filtered.map(a => ({
+      title: sanitizeTextForUI(a?.webTitle || ""),
+      url: a?.webUrl || "",
+      image: a?.fields?.thumbnail || null,
+      publishedAt: a?.webPublicationDate || "",
     }));
 
     const out = dedupe(base, RETURN_N, wantImages);

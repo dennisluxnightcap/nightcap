@@ -3,7 +3,7 @@ import { ScrollText } from "lucide-react";
 import { motion } from "framer-motion";
 
 type HistoryEvent = {
-  year: number;
+  year: number | string;
   text: string;
   image: string | null;
   link: string;
@@ -21,13 +21,35 @@ export default function HistoryCard({
   useEffect(() => {
     async function fetchEvents() {
       try {
-        const res = await fetch("/api/todayHistory?n=3"); // ✅ get 3
+        const today = new Date();
+        const month = String(today.getMonth() + 1).padStart(2, "0");
+        const day = String(today.getDate()).padStart(2, "0");
+
+        const res = await fetch(
+          `https://en.wikipedia.org/api/rest_v1/feed/onthisday/events/${month}/${day}`
+        );
         const data = await res.json();
-        setEvents(data);
+
+        const events = data.events
+          .filter((ev: any) => ev.pages?.some((p: any) => p.thumbnail))
+          .sort(() => Math.random() - 0.5)
+          .slice(0, 3)
+          .map((ev: any) => {
+            const page = ev.pages[0];
+            return {
+              year: ev.year,
+              text: ev.text,
+              image: page.thumbnail?.source || null,
+              link: page.content_urls.desktop.page,
+            };
+          });
+
+        setEvents(events);
       } catch (err) {
         console.error("Failed to load history events", err);
       }
     }
+
     fetchEvents();
   }, []);
 
@@ -50,7 +72,8 @@ export default function HistoryCard({
         ) : (
           events.map((ev, i) => (
             <motion.div
-              key={i} className="event"
+              key={i}
+              className="event"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 1.5, delay: i * 0.2 }}
@@ -68,13 +91,12 @@ export default function HistoryCard({
                 />
               )}
               <p>
-  <span className="year">{ev.year}</span>
-  {ev.text}{" "}
-  <a href={ev.link} target="_blank" rel="noopener noreferrer">
-    Read more →
-  </a>
-</p>
-
+                <span className="year">{ev.year}</span>
+                {ev.text}{" "}
+                <a href={ev.link} target="_blank" rel="noopener noreferrer">
+                  Read more →
+                </a>
+              </p>
             </motion.div>
           ))
         )}

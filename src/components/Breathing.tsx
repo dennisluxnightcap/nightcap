@@ -1,5 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { motion, useAnimation, AnimatePresence } from "framer-motion";
+import { recordBedtime, getBedtimeHistory } from "../utils/bedtimeTracker";
+import WeatherForecast from "./WeatherForecast";
+import ScreenTime, { formatDuration } from "../utils/screenTime";
 
 type PatternObj = { inhale: number; hold?: number; exhale: number };
 export type Breathing = {
@@ -14,6 +17,7 @@ export default function Breathing({
   script,
   onComplete,
 }: Breathing & { onComplete?: () => void }) {
+  // Parse breathing pattern
   const parsed = (() => {
     if (typeof pattern === "string") {
       const parts = pattern
@@ -33,12 +37,13 @@ export default function Breathing({
   })();
 
   const controls = useAnimation();
-
   const [phase, setPhase] = useState<
     "getready" | "inhale" | "hold" | "exhale" | "done"
   >("getready");
-
   const [remainingSec, setRemainingSec] = useState<number | null>(null);
+  const [bedtimeHistory, setBedtimeHistory] = useState<Date[]>([]);
+  const [screenTimeMs, setScreenTimeMs] = useState<number | null>(null);
+
   const timerRef = useRef<number | null>(null);
   const phaseEndAtRef = useRef<number>(0);
 
@@ -71,7 +76,7 @@ export default function Breathing({
       setPhase("getready");
       setRemainingSec(null);
 
-      // ✅ Longer delay before first inhale
+      // delay before first inhale
       await sleep(3000);
 
       for (let r = 0; r < rounds && alive; r++) {
@@ -123,10 +128,23 @@ export default function Breathing({
 
       if (!alive) return;
 
-      // just switch phase – AnimatePresence will fade
+      // record bedtime after session ends
+      recordBedtime();
+      setBedtimeHistory(getBedtimeHistory());
+
+      // fetch screen time for Good Night screen
+      try {
+        const { granted } = await ScreenTime.hasPermission();
+        if (granted) {
+          const result = await ScreenTime.getScreenTime();
+          if (result.totalMs != null) setScreenTimeMs(result.totalMs);
+        }
+      } catch {
+        // silently skip if unavailable
+      }
+
       setPhase("done");
       setRemainingSec(null);
-
       onComplete?.();
     };
 
@@ -197,6 +215,61 @@ export default function Breathing({
               <p className="breathing-script">
                 Sleep well, you’re all set for today.
               </p>
+
+              {/* 📱 Screen Time */}
+              {screenTimeMs != null && (
+                <motion.div
+                  className="bedtime-history"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 1.0, delay: 0.4, ease: "easeOut" }}
+                >
+                  <p className="history-label">Screen time today</p>
+                  <p className="screentime-total" style={{ fontSize: "clamp(28px, 7vw, 40px)", margin: "4px 0 0" }}>
+                    {formatDuration(screenTimeMs)}
+                  </p>
+                </motion.div>
+              )}
+
+              {/* 🌦 Weather Forecast */}
+              <WeatherForecast />
+
+              {/* 🕙 Bedtime timeline */}
+              {bedtimeHistory.length > 0 && (
+                <div className="bedtime-history">
+                  <p className="history-label">Your recent bedtimes</p>
+                  <motion.div
+                    className="history-row"
+                    layout
+                    transition={{ duration: 0.6, ease: "easeInOut" }}
+                  >
+                    <AnimatePresence initial={false}>
+  {bedtimeHistory
+    .slice(0, 4)
+    .reverse()
+    .map((d) => {
+      const time = d.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+      return (
+        <motion.div
+          key={d.toISOString()}
+          className="history-face"
+          initial={{ opacity: 0, x: 40 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -40 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+        >
+          🕙 {time}
+        </motion.div>
+      );
+    })}
+</AnimatePresence>
+
+                  </motion.div>
+                </div>
+              )}
             </motion.div>
           )}
         </AnimatePresence>

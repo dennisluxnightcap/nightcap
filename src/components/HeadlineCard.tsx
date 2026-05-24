@@ -1,4 +1,3 @@
-// src/components/HeadlineCard.tsx
 import React, { useEffect, useState } from "react";
 
 type NewsItem = {
@@ -19,29 +18,14 @@ export default function HeadlineCard({ n = 5 }: { n?: number }) {
       try {
         setErr(null);
 
-        // detect if we're running inside the Android app
-        const isApp =
-          typeof window !== "undefined" &&
-          window.location.protocol === "file:";
-
-        let url: string;
-
-        if (isApp) {
-          // direct GNews + proxy for Android
-          const GNEWS_API_KEY = "d98739eb9b8ac50f63d3df46060dc55e";
-          const gnewsUrl = `https://gnews.io/api/v4/top-headlines?token=${GNEWS_API_KEY}&lang=en&country=us&max=${n}`;
-          const proxy = "https://api.allorigins.win/raw?url=";
-          url = `${proxy}${encodeURIComponent(gnewsUrl)}`;
-        } else {
-          // web build still uses the Vercel API route
-          url = `/api/dailyNews?n=${n}&image=1&topic=world&lang=en`;
-        }
+        // All builds (web + Android) now use the same Vercel endpoint
+        const url = `https://nightcap-eta.vercel.app/api/dailyNews?n=${n}&image=1`;
 
         const r = await fetch(url, { headers: { Accept: "application/json" } });
         if (!r.ok) throw new Error(await r.text());
         const data = await r.json();
 
-        // normalize both response shapes
+        // Normalize the response shape
         const articles = Array.isArray(data.items)
           ? data.items
           : Array.isArray(data.articles)

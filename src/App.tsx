@@ -10,10 +10,9 @@ import LearnFact from "./components/LearnFact";
 import Story from "./components/Story";
 import HistoryCard from "./components/HistoryCard";
 import MoodSlider from "./components/MoodSlider";
-import VideoCard from "./components/VideoCard"; // ✅ new import
+import VideoCard from "./components/VideoCard";
 import { motion, AnimatePresence } from "framer-motion";
 
-// ✅ Steps (Video added between Story and Mood)
 const steps = [
   "Summary",
   "Feel-good",
@@ -111,22 +110,25 @@ export default function App() {
           )}
 
           {step === "Feel-good" && (
-            <FeelGoodFact
-              text={daily.feelGood.text}
-              image={daily.feelGood.image}
-              onNext={next}
-              onPrev={maybePrev}
-            />
-          )}
+  <FeelGoodFact
+    text={daily.feelGood.text}
+    sub={daily.feelGood.sub}     // ✅ added
+    image={daily.feelGood.image}
+    onNext={next}
+    onPrev={maybePrev}
+  />
+)}
 
-          {step === "Learn" && (
-            <LearnFact
-              text={daily.learn.text}
-              image={daily.learn.image}
-              onNext={next}
-              onPrev={maybePrev}
-            />
-          )}
+{step === "Learn" && (
+  <LearnFact
+    text={daily.learn.text}
+    sub={daily.learn.sub}         // ✅ added
+    image={daily.learn.image}
+    onNext={next}
+    onPrev={maybePrev}
+  />
+)}
+
 
           {step === "History" && (
             <HistoryCard onNext={next} onPrev={maybePrev} />

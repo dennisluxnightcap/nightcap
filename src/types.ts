@@ -1,5 +1,4 @@
-// types.ts
-
+// src/types.ts
 export type Breathing = { 
   pattern: string; 
   rounds: number; 
@@ -16,6 +15,7 @@ export type SummaryItem = {
 // Shared type for fact-like cards
 export type Fact = {
   text: string;
+  sub?: string;
   image?: string;
 };
 
@@ -33,12 +33,22 @@ export type Video = {
   year?: number;
 };
 
+// ✅ New HistoryEvent type
+export type HistoryEvent = {
+  year: string | number;
+  text: string;
+  image?: string | null;
+  link?: string;
+};
+
+// ✅ Daily structure (now includes history array)
 export type Daily = {
   summary: (string | SummaryItem)[];
+  history: HistoryEvent[];   // ✅ multiple events
   feelGood: Fact;
   learn: Fact;
   story: Fact;
   breathing: Breathing;
   brightspot: Brightspot;
-  video: Video; // ✅ added here
+  video: Video;
 };
