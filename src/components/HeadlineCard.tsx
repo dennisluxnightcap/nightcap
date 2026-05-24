@@ -18,24 +18,31 @@ export default function HeadlineCard({ n = 5 }: { n?: number }) {
       try {
         setErr(null);
 
-        const key = "6047c790-a24b-4dc3-9a9b-ab9fb70f0208";
-        const url = `https://content.guardianapis.com/search?api-key=${key}&show-fields=thumbnail&order-by=newest&page-size=50`;
+        const key = "M03lo3mDZHrtPmCyN8wm43gAWt7IDqIZj4LTrlUnkNHtFn78";
+        const sections = ["world", "technology", "science", "sports", "business"];
+        const responses = await Promise.all(
+          sections.map(s =>
+            fetch(`https://api.nytimes.com/svc/topstories/v2/${s}.json?api-key=${key}`)
+              .then(r => r.ok ? r.json() : { results: [] })
+              .catch(() => ({ results: [] }))
+          )
+        );
 
-        const r = await fetch(url, { headers: { Accept: "application/json" } });
-        if (!r.ok) throw new Error(`Guardian ${r.status}`);
-        const data = await r.json();
+        const seen = new Set<string>();
+        const raw = responses.flatMap(d => Array.isArray(d.results) ? d.results : []);
 
-        const raw = Array.isArray(data?.response?.results) ? data.response.results : [];
-
-        // Filter out liveblogs and local/trivial stories
-        const EXCLUDE_SECTIONS = new Set(["uk-news", "society", "lifeandstyle", "fashion", "food", "travel", "money", "housing-network", "commentisfree"]);
         const articles: NewsItem[] = raw
-          .filter((a: any) => a.type !== "liveblog" && !EXCLUDE_SECTIONS.has(a.sectionId))
+          .filter((a: any) => {
+            if (!a.title || !a.url) return false;
+            if (seen.has(a.title)) return false;
+            seen.add(a.title);
+            return true;
+          })
           .map((a: any) => ({
-            title: a.webTitle || "",
-            url: a.webUrl || "",
-            image: a.fields?.thumbnail || null,
-            publishedAt: a.webPublicationDate || "",
+            title: a.title || "",
+            url: a.url || "",
+            image: a.multimedia?.[0]?.url || null,
+            publishedAt: a.published_date || "",
           }))
           .slice(0, n);
 
