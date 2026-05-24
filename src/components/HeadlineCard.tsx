@@ -19,33 +19,26 @@ export default function HeadlineCard({ n = 5 }: { n?: number }) {
         setErr(null);
 
         const key = "M03lo3mDZHrtPmCyN8wm43gAWt7IDqIZj4LTrlUnkNHtFn78";
-        const sectionQuotas: [string, number][] = [
-          ["world", 2],
-          ["technology", 1],
-          ["science", 1],
-          ["sports", 1],
-        ];
-        const responses = await Promise.all(
-          sectionQuotas.map(([s]) =>
-            fetch(`https://api.nytimes.com/svc/topstories/v2/${s}.json?api-key=${key}`)
-              .then(r => r.ok ? r.json() : { results: [] })
-              .catch(() => ({ results: [] }))
-          )
-        );
+        const data = await fetch(
+          `https://api.nytimes.com/svc/topstories/v2/home.json?api-key=${key}`
+        ).then(r => r.ok ? r.json() : { results: [] });
 
-        const articles: NewsItem[] = responses.flatMap((d, i) => {
-          const quota = sectionQuotas[i][1];
-          const results = Array.isArray(d.results) ? d.results : [];
-          return results
-            .filter((a: any) => a.title && a.url)
-            .slice(0, quota)
-            .map((a: any) => ({
-              title: a.title || "",
-              url: a.url || "",
-              image: a.multimedia?.[0]?.url || null,
-              publishedAt: a.published_date || "",
-            }));
-        });
+        const junkPattern = /newsletter|subscribe|sign up|sign-up|quiz|crossword|wordle|podcast/i;
+
+        const articles: NewsItem[] = (Array.isArray(data.results) ? data.results : [])
+          .filter((a: any) =>
+            a.title &&
+            a.url &&
+            a.item_type === "Article" &&
+            !junkPattern.test(a.title)
+          )
+          .slice(0, n)
+          .map((a: any) => ({
+            title: a.title || "",
+            url: a.url || "",
+            image: a.multimedia?.[0]?.url || null,
+            publishedAt: a.published_date || "",
+          }));
 
         if (!cancelled) setItems(articles);
       } catch (e: any) {
