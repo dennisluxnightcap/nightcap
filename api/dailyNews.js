@@ -50,7 +50,7 @@ function dedupe(arr, limit, requireImage) {
 function buildGuardianURL(key) {
   const u = new URL("https://content.guardianapis.com/search");
   u.searchParams.set("api-key", key);
-  u.searchParams.set("section", "world,science,technology,environment,global-development");
+  u.searchParams.set("section", "world");
   u.searchParams.set("show-fields", "thumbnail,trailText");
   u.searchParams.set("order-by", "newest");
   u.searchParams.set("page-size", "50");          // fetch lots so we have room to filter
@@ -79,11 +79,7 @@ export default async function handler(req, res) {
     const raw = Array.isArray(j?.response?.results) ? j.response.results : [];
 
     // Only keep major global sections, no liveblogs
-    const GLOBAL_SECTIONS = new Set(["world", "science", "technology", "environment", "global-development"]);
-    const filtered = raw.filter(a =>
-      a.type !== "liveblog" &&
-      GLOBAL_SECTIONS.has(a.sectionId)
-    );
+    const filtered = raw.filter(a => a.type !== "liveblog");
 
     const base = filtered.map(a => ({
       title: sanitizeTextForUI(a?.webTitle || ""),
