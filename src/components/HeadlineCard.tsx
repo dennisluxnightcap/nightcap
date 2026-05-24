@@ -19,8 +19,7 @@ export default function HeadlineCard({ n = 5 }: { n?: number }) {
         setErr(null);
 
         const key = "6047c790-a24b-4dc3-9a9b-ab9fb70f0208";
-        const sections = "world,sport,science,technology,environment,business,culture";
-        const url = `https://content.guardianapis.com/search?api-key=${key}&section=${sections}&show-fields=thumbnail&order-by=newest&page-size=50`;
+        const url = `https://content.guardianapis.com/search?api-key=${key}&show-fields=thumbnail&order-by=newest&page-size=50`;
 
         const r = await fetch(url, { headers: { Accept: "application/json" } });
         if (!r.ok) throw new Error(`Guardian ${r.status}`);
@@ -29,7 +28,7 @@ export default function HeadlineCard({ n = 5 }: { n?: number }) {
         const raw = Array.isArray(data?.response?.results) ? data.response.results : [];
 
         // Filter out liveblogs and local/trivial stories
-        const EXCLUDE_SECTIONS = new Set(["uk-news", "society", "lifeandstyle", "fashion", "food"]);
+        const EXCLUDE_SECTIONS = new Set(["uk-news", "society", "lifeandstyle", "fashion", "food", "travel", "money", "housing-network", "commentisfree"]);
         const articles: NewsItem[] = raw
           .filter((a: any) => a.type !== "liveblog" && !EXCLUDE_SECTIONS.has(a.sectionId))
           .map((a: any) => ({
