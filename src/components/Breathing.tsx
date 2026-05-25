@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { motion, useAnimation, AnimatePresence } from "framer-motion";
 import { recordBedtime, getBedtimeHistory } from "../utils/bedtimeTracker";
 import WeatherForecast from "./WeatherForecast";
+import BedtimeHistory from "./BedtimeHistory";
 import ScreenTime, { formatDuration } from "../utils/screenTime";
 
 type PatternObj = { inhale: number; hold?: number; exhale: number };
@@ -234,41 +235,12 @@ export default function Breathing({
               {/* 🌦 Weather Forecast */}
               <WeatherForecast />
 
-              {/* 🕙 Bedtime timeline */}
+              {/* 🕙 Bedtime history + trend */}
               {bedtimeHistory.length > 0 && (
-                <div className="bedtime-history">
-                  <p className="history-label">Your recent bedtimes</p>
-                  <motion.div
-                    className="history-row"
-                    layout
-                    transition={{ duration: 0.6, ease: "easeInOut" }}
-                  >
-                    <AnimatePresence initial={false}>
-  {bedtimeHistory
-    .slice(0, 4)
-    .reverse()
-    .map((d) => {
-      const time = d.toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-      return (
-        <motion.div
-          key={d.toISOString()}
-          className="history-face"
-          initial={{ opacity: 0, x: 40 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -40 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-        >
-          🕙 {time}
-        </motion.div>
-      );
-    })}
-</AnimatePresence>
-
-                  </motion.div>
-                </div>
+                <>
+                  <hr className="insight-divider" />
+                  <BedtimeHistory />
+                </>
               )}
             </motion.div>
           )}
