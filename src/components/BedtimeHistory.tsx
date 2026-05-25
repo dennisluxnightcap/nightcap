@@ -11,7 +11,11 @@ function minutesSinceNoon(date: Date): number {
 export default function BedtimeHistory() {
   // 🔹 Get full bedtime history and reverse to oldest → newest (left → right)
   const fullHistory = getBedtimeHistory().reverse();
-  if (!fullHistory.length) return null;
+  if (!fullHistory.length) return (
+    <p className="history-label" style={{ opacity: 0.5, textAlign: "center" }}>
+      Complete tonight's session to start tracking your bedtimes.
+    </p>
+  );
 
   // ✅ Only show the 4 most recent entries visually
   const history = fullHistory.slice(-4);

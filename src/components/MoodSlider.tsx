@@ -247,17 +247,23 @@ export default function MoodSlider({
         {/* --- Mood history --- */}
         <div className="mood-history">
           <p className="history-label">How you’ve felt this week</p>
-          <div className="history-row">
-            {history.map((entry, i) => (
-              <div key={i} className="history-face">
-                {entry ? (
-                  <Face kind={entry.mood} active={true} />
-                ) : (
-                  <span className="placeholder">–</span>
-                )}
-              </div>
-            ))}
-          </div>
+          {logs.length === 0 ? (
+            <p className="history-label" style={{ opacity: 0.5, textAlign: "center" }}>
+              Check in each night to see your week.
+            </p>
+          ) : (
+            <div className="history-row">
+              {history.map((entry, i) => (
+                <div key={i} className="history-face">
+                  {entry ? (
+                    <Face kind={entry.mood} active={true} />
+                  ) : (
+                    <span className="placeholder">–</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
       </div>
