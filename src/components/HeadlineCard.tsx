@@ -23,19 +23,21 @@ export default function HeadlineCard({ n = 5 }: { n?: number }) {
           `https://api.nytimes.com/svc/topstories/v2/world.json?api-key=${key}`
         ).then(r => r.ok ? r.json() : { results: [] });
 
-        const seenTopics = new Set<string>();
-        const articles: NewsItem[] = [];
+        const junkPattern = /^here's the latest|^track changes|^breaking news/i;
+        const stopWords = new Set(["about","after","against","around","before","between","could","first","great","large","might","other","since","still","their","there","these","those","under","until","where","which","while","would","years","being"]);
+        const seenWords = new Set<string>();
 
+        const getKeywords = (title: string) =>
+          title.toLowerCase().split(/\W+/).filter(w => w.length > 5 && !stopWords.has(w));
+
+        const articles: NewsItem[] = [];
         for (const a of (data.results || [])) {
           if (!a.title || !a.url || a.item_type !== "Article") continue;
+          if (junkPattern.test(a.title)) continue;
 
-          const facets: string[] = [
-            ...(a.des_facet || []),
-            ...(a.geo_facet || []),
-          ];
-
-          if (facets.some(f => seenTopics.has(f))) continue;
-          facets.forEach(f => seenTopics.add(f));
+          const keywords = getKeywords(a.title);
+          if (keywords.some(w => seenWords.has(w))) continue;
+          keywords.forEach(w => seenWords.add(w));
 
           articles.push({
             title: a.title,
