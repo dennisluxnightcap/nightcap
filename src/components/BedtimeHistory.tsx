@@ -66,7 +66,6 @@ export default function BedtimeHistory() {
           return (
             <span key={i} className="history-face">
               {icon}&nbsp;{time}
-              {i < history.length - 1 && <span className="dash"> — </span>}
             </span>
           );
         })}
