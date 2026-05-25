@@ -20,28 +20,23 @@ export default function HeadlineCard({ n = 5 }: { n?: number }) {
 
         const key = "M03lo3mDZHrtPmCyN8wm43gAWt7IDqIZj4LTrlUnkNHtFn78";
         const data = await fetch(
-          `https://api.nytimes.com/svc/topstories/v2/home.json?api-key=${key}`
+          `https://api.nytimes.com/svc/topstories/v2/world.json?api-key=${key}`
         ).then(r => r.ok ? r.json() : { results: [] });
 
-        const allowedSections = new Set(["world", "technology", "science", "sports", "business", "health"]);
-        const junkPattern = /newsletter|subscribe|sign up|sign-up|quiz|crossword|wordle|podcast/i;
         const seenTopics = new Set<string>();
-
         const articles: NewsItem[] = [];
+
         for (const a of (data.results || [])) {
           if (!a.title || !a.url || a.item_type !== "Article") continue;
-          if (junkPattern.test(a.title)) continue;
-          if (!allowedSections.has(a.section)) continue;
 
           const facets: string[] = [
             ...(a.des_facet || []),
             ...(a.geo_facet || []),
           ];
 
-          const isDuplicate = facets.some(f => seenTopics.has(f));
-          if (isDuplicate) continue;
-
+          if (facets.some(f => seenTopics.has(f))) continue;
           facets.forEach(f => seenTopics.add(f));
+
           articles.push({
             title: a.title,
             url: a.url,
