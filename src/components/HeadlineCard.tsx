@@ -19,35 +19,49 @@ export default function HeadlineCard({ n = 5 }: { n?: number }) {
         setErr(null);
 
         const key = "M03lo3mDZHrtPmCyN8wm43gAWt7IDqIZj4LTrlUnkNHtFn78";
-        const data = await fetch(
-          `https://api.nytimes.com/svc/topstories/v2/world.json?api-key=${key}`
-        ).then(r => r.ok ? r.json() : { results: [] });
+        const [worldData, techData, sportsData] = await Promise.all([
+          fetch(`https://api.nytimes.com/svc/topstories/v2/world.json?api-key=${key}`).then(r => r.ok ? r.json() : { results: [] }),
+          fetch(`https://api.nytimes.com/svc/topstories/v2/technology.json?api-key=${key}`).then(r => r.ok ? r.json() : { results: [] }),
+          fetch(`https://api.nytimes.com/svc/topstories/v2/sports.json?api-key=${key}`).then(r => r.ok ? r.json() : { results: [] }),
+        ]);
 
         const junkPattern = /^here's the latest|^track changes|^breaking news/i;
         const stopWords = new Set(["about","after","against","around","before","between","could","first","great","large","might","other","since","still","their","there","these","those","under","until","where","which","while","would","years","being"]);
-        const seenWords = new Set<string>();
 
         const getKeywords = (title: string) =>
           title.toLowerCase().split(/\W+/).filter(w => w.length > 5 && !stopWords.has(w));
 
-        const articles: NewsItem[] = [];
-        for (const a of (data.results || [])) {
-          if (!a.title || !a.url || a.item_type !== "Article") continue;
-          if (junkPattern.test(a.title)) continue;
+        const isValid = (a: any) =>
+          a.title && a.url && a.item_type === "Article" && !junkPattern.test(a.title);
 
+        const toItem = (a: any): NewsItem => ({
+          title: a.title,
+          url: a.url,
+          image: a.multimedia?.[0]?.url || null,
+          publishedAt: a.published_date || "",
+        });
+
+        // 3 world headlines with light dedup
+        const seenWords = new Set<string>();
+        const worldArticles: NewsItem[] = [];
+        for (const a of (worldData.results || [])) {
+          if (!isValid(a)) continue;
           const keywords = getKeywords(a.title);
           if (keywords.some(w => seenWords.has(w))) continue;
           keywords.forEach(w => seenWords.add(w));
-
-          articles.push({
-            title: a.title,
-            url: a.url,
-            image: a.multimedia?.[0]?.url || null,
-            publishedAt: a.published_date || "",
-          });
-
-          if (articles.length >= n) break;
+          worldArticles.push(toItem(a));
+          if (worldArticles.length >= 3) break;
         }
+
+        // 1 tech, 1 sports — just first valid article
+        const techArticle = (techData.results || []).find(isValid);
+        const sportsArticle = (sportsData.results || []).find(isValid);
+
+        const articles: NewsItem[] = [
+          ...worldArticles,
+          ...(techArticle ? [toItem(techArticle)] : []),
+          ...(sportsArticle ? [toItem(sportsArticle)] : []),
+        ];
 
         if (!cancelled) setItems(articles);
       } catch (e: any) {
