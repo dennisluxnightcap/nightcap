@@ -23,6 +23,7 @@ export default function HeadlineCard({ n = 5 }: { n?: number }) {
           `https://api.nytimes.com/svc/topstories/v2/home.json?api-key=${key}`
         ).then(r => r.ok ? r.json() : { results: [] });
 
+        const allowedSections = new Set(["World", "Technology", "Science", "Sports", "Business", "Health"]);
         const junkPattern = /newsletter|subscribe|sign up|sign-up|quiz|crossword|wordle|podcast/i;
         const seenTopics = new Set<string>();
 
@@ -30,6 +31,7 @@ export default function HeadlineCard({ n = 5 }: { n?: number }) {
         for (const a of (data.results || [])) {
           if (!a.title || !a.url || a.item_type !== "Article") continue;
           if (junkPattern.test(a.title)) continue;
+          if (!allowedSections.has(a.section)) continue;
 
           const facets: string[] = [
             ...(a.des_facet || []),
