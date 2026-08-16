@@ -179,29 +179,20 @@ Rules:
 
 /* ---------- combine + cache ---------- */
 async function buildDaySummary() {
-  const debug = { guardianCount: 0, guardianError: null, bbcCount: 0, bbcError: null, guardianWithImage: 0, bbcWithImage: 0 };
-
   const [guardian, bbc] = await Promise.all([
-    fetchGuardian().catch((e) => { debug.guardianError = e.message; return []; }),
-    fetchBBC().catch((e) => { debug.bbcError = e.message; return []; }),
+    fetchGuardian().catch(() => []),
+    fetchBBC().catch(() => []),
   ]);
-  debug.guardianCount = guardian.length;
-  debug.bbcCount = bbc.length;
-  debug.guardianWithImage = guardian.filter((a) => a.image).length;
-  debug.bbcWithImage = bbc.filter((a) => a.image).length;
 
   const combined = dedupe([...guardian, ...bbc]);
   if (combined.length === 0) {
-    LAST_OK = globalThis._DAYSUMMARY_CACHE = {
-      ts: Date.now(),
-      data: { leadImage: null, items: [] },
-    };
+    LAST_OK = globalThis._DAYSUMMARY_CACHE = { ts: Date.now(), data: { items: [] } };
     return;
   }
 
   const aiItems = await writeSummary(combined);
 
-  const built = aiItems
+  const items = aiItems
     .map((it) => {
       const article = combined[it.sourceIndex];
       if (!article) return null;
@@ -210,10 +201,7 @@ async function buildDaySummary() {
     })
     .filter(Boolean);
 
-  const leadImage = built.find((b) => b.image)?.image ?? null;
-  const items = built.map(({ text, keyPhrase, sourceUrl }) => ({ text, keyPhrase, sourceUrl }));
-
-  LAST_OK = globalThis._DAYSUMMARY_CACHE = { ts: Date.now(), data: { leadImage, items, debug } };
+  LAST_OK = globalThis._DAYSUMMARY_CACHE = { ts: Date.now(), data: { items } };
 }
 
 /* ---------- handler ---------- */
@@ -238,8 +226,8 @@ export default async function handler(req, res) {
     await ongoingFetch;
   } catch (e) {
     console.error("daySummary error:", e);
-    return res.status(200).json({ leadImage: null, items: [], error: e.message });
+    return res.status(200).json({ items: [], error: e.message });
   }
 
-  res.status(200).json(LAST_OK.data || { leadImage: null, items: [] });
+  res.status(200).json(LAST_OK.data || { items: [] });
 }
