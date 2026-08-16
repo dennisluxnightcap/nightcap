@@ -1750,13 +1750,16 @@ body {
 
 .day-summary-row-text {
   margin: 0;
-  /* Deliberately no font-family override: .summary-hero .title and
-     .brightspot-teaser (the two most visible reference elements on this
-     screen) also have none, inheriting body's Inter default. Explicitly
-     requesting Manrope here rendered a genuinely different font from them. */
+  /* Matches .brightspot-content p's treatment -- the actual reference: a
+     white Manrope fill with a thin black stroke and heavy shadow blur is
+     what gives the app's paragraph text its look, not the font family alone. */
+  font-family: Manrope, Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
   font-size: 14.5px;
   line-height: 1.5;
-  color: var(--text);
+  color: rgb(255, 255, 255);
+  text-shadow: rgba(0, 0, 0, 0.9) 2px 3px 44px;
+  -webkit-text-stroke: 0.2px black;
+  text-wrap: pretty;
   text-align: center;
 }
 
