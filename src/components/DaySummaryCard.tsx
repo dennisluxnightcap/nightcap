@@ -95,7 +95,6 @@ export default function DaySummaryCard() {
           {item.image && (
             <div className="day-summary-thumb-wrap">
               <img className="day-summary-thumb" src={item.image} alt="" />
-              <span className="day-summary-thumb-index">{i + 1}</span>
             </div>
           )}
           {renderItemText(item)}
