@@ -1,5 +1,5 @@
 // DailySummary.tsx
-import HeadlineCard from "./HeadlineCard";
+import DaySummaryCard from "./DaySummaryCard";
 import BrightSpot from "./BrightSpot";
 import type { Brightspot } from "../types";
 
@@ -21,7 +21,7 @@ export default function DailySummary({
         </h2>
       </header>
 
-      <HeadlineCard />
+      <DaySummaryCard />
 
       {/* Bright Spot footer */}
       <BrightSpot spot={spot} onNext={onNext} />
