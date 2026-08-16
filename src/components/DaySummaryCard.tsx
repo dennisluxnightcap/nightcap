@@ -15,14 +15,14 @@ function renderItemText(item: DaySummaryItem) {
   const idx = item.keyPhrase ? item.text.indexOf(item.keyPhrase) : -1;
 
   if (idx === -1) {
-    return <p className="day-summary-item-text">{item.text}</p>;
+    return <p className="day-summary-row-text">{item.text}</p>;
   }
 
   const before = item.text.slice(0, idx);
   const after = item.text.slice(idx + (item.keyPhrase as string).length);
 
   return (
-    <p className="day-summary-item-text">
+    <p className="day-summary-row-text">
       {before}
       <a
         className="day-summary-link"
@@ -66,9 +66,9 @@ export default function DaySummaryCard() {
   // Loading
   if (data === null) {
     return (
-      <div className="day-summary-list" aria-busy="true">
-        <div className="day-summary-item day-summary-item-loading">
-          <p className="day-summary-item-text">Looking back at today…</p>
+      <div className="day-summary-card" aria-busy="true">
+        <div className="day-summary-row">
+          <p className="day-summary-row-text">Looking back at today…</p>
         </div>
       </div>
     );
@@ -77,8 +77,8 @@ export default function DaySummaryCard() {
   // Error or empty
   if (err || data.items.length === 0) {
     return (
-      <div className="day-summary-list">
-        <div className="day-summary-item">
+      <div className="day-summary-card">
+        <div className="day-summary-row">
           <p className="day-summary-empty">Not much to report from today.</p>
         </div>
       </div>
@@ -86,11 +86,17 @@ export default function DaySummaryCard() {
   }
 
   return (
-    <div className="day-summary-list">
+    <div className="day-summary-card">
       {data.items.map((item, i) => (
-        <div className="day-summary-item" key={i}>
+        <div
+          className={`day-summary-row ${i % 2 === 1 ? "reverse" : ""}`}
+          key={i}
+        >
           {item.image && (
-            <img className="day-summary-item-image" src={item.image} alt="" />
+            <div className="day-summary-thumb-wrap">
+              <img className="day-summary-thumb" src={item.image} alt="" />
+              <span className="day-summary-thumb-index">{i + 1}</span>
+            </div>
           )}
           {renderItemText(item)}
         </div>
