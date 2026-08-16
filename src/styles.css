@@ -1771,7 +1771,10 @@ body {
 
 .day-summary-row-text {
   margin: 0;
-  font-family: "Manrope", Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  /* Deliberately no font-family override: .summary-hero .title and
+     .brightspot-teaser (the two most visible reference elements on this
+     screen) also have none, inheriting body's Inter default. Explicitly
+     requesting Manrope here rendered a genuinely different font from them. */
   font-size: 14.5px;
   line-height: 1.5;
   color: var(--text);
@@ -1793,7 +1796,6 @@ body {
 .day-summary-empty {
   margin: 0;
   color: var(--muted);
-  font-family: "Manrope", Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
   font-size: 15px;
   text-align: center;
   width: 100%;
