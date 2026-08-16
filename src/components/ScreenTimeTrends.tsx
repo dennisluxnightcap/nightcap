@@ -215,6 +215,11 @@ export default function ScreenTimeTrends({ logs }: { logs: ScreenTimeLog[] }) {
                 strokeLinejoin="round"
               />
 
+              {/* per-day dots */}
+              {points.map((p) => (
+                <circle key={p.entry.date} cx={p.x} cy={p.y} r={2.5} fill="#5ce1e6" stroke="#0b0f1a" strokeWidth={1.5} />
+              ))}
+
               {/* end value label + end dot */}
               {last && (
                 <>
