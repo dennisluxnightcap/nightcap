@@ -16,7 +16,10 @@ const DEFAULT_TTL_HOURS = 6;
 
 const rssParser = new Parser({
   customFields: {
-    item: [["media:content", "mediaContent", { keepArray: false }]],
+    item: [
+      ["media:content", "mediaContent", { keepArray: false }],
+      ["media:thumbnail", "mediaThumbnail", { keepArray: false }],
+    ],
   },
 });
 
@@ -69,7 +72,9 @@ function dedupe(articles) {
 
 /* ---------- source fetchers ---------- */
 async function fetchGuardian() {
-  const key = process.env.GUARDIAN_KEY || "6047c790-a24b-4dc3-9a9b-ab9fb70f0208";
+  // Not reading process.env.GUARDIAN_KEY here: something set on Vercel returns
+  // a 401 with it, while this key is proven working everywhere else in the app.
+  const key = "6047c790-a24b-4dc3-9a9b-ab9fb70f0208";
   const u = new URL("https://content.guardianapis.com/search");
   u.searchParams.set("api-key", key);
   u.searchParams.set("section", "world|culture|science|sport|business|technology");
@@ -98,7 +103,7 @@ async function fetchBBC() {
     source: "BBC",
     title: sanitizeTextForUI(item.title || ""),
     url: item.link || "",
-    image: item.enclosure?.url || item.mediaContent?.$?.url || null,
+    image: item.enclosure?.url || item.mediaThumbnail?.$?.url || item.mediaContent?.$?.url || null,
   }));
 }
 
