@@ -174,10 +174,16 @@ Rules:
 
 /* ---------- combine + cache ---------- */
 async function buildDaySummary() {
+  const debug = { guardianCount: 0, guardianError: null, bbcCount: 0, bbcError: null, guardianWithImage: 0, bbcWithImage: 0 };
+
   const [guardian, bbc] = await Promise.all([
-    fetchGuardian().catch(() => []),
-    fetchBBC().catch(() => []),
+    fetchGuardian().catch((e) => { debug.guardianError = e.message; return []; }),
+    fetchBBC().catch((e) => { debug.bbcError = e.message; return []; }),
   ]);
+  debug.guardianCount = guardian.length;
+  debug.bbcCount = bbc.length;
+  debug.guardianWithImage = guardian.filter((a) => a.image).length;
+  debug.bbcWithImage = bbc.filter((a) => a.image).length;
 
   const combined = dedupe([...guardian, ...bbc]);
   if (combined.length === 0) {
@@ -202,7 +208,7 @@ async function buildDaySummary() {
   const leadImage = built.find((b) => b.image)?.image ?? null;
   const items = built.map(({ text, keyPhrase, sourceUrl }) => ({ text, keyPhrase, sourceUrl }));
 
-  LAST_OK = globalThis._DAYSUMMARY_CACHE = { ts: Date.now(), data: { leadImage, items } };
+  LAST_OK = globalThis._DAYSUMMARY_CACHE = { ts: Date.now(), data: { leadImage, items, debug } };
 }
 
 /* ---------- handler ---------- */
