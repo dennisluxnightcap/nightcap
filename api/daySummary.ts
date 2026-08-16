@@ -122,7 +122,7 @@ Write a calm, plain-language overview of what actually happened today, for a bed
 
 Rules:
 - 2-4 short, distinct items. Each item is one plain sentence (not headline-style) about a genuinely significant event of the day.
-- Judge significance yourself from the content — don't just repeat whatever is most frequent. A story reported independently by both outlets is a strong signal it's genuinely significant.
+- Judge significance yourself from the content — don't just repeat whatever is most frequent. A story reported independently by both outlets is A SIGNAL, not proof, of significance — Guardian and BBC are both British outlets, so they will naturally both cover UK-domestic stories (energy bills, cost of living, UK government policy, UK economic data) simply because they share a British audience, not because those stories are globally important. Do not include a UK-domestic policy/economic story just because both outlets ran it. Prioritize events with real global, cross-border, or human-stakes significance (disasters, conflict, major international developments) over domestic British news coverage.
 - Lead with anything genuinely new. Treat ongoing/continuing situations (a war, a trial, a long-running crisis) as one brief mention rather than dwelling on them.
 - Do NOT force in a positive or "lighter" item if nothing genuinely light happened — only include one if it's actually among the day's real, significant events.
 - For each item, set sourceIndex to the number of the article (from the list above) it's primarily based on.
