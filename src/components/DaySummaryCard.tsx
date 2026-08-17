@@ -47,7 +47,9 @@ export default function DaySummaryCard() {
     (async () => {
       try {
         setErr(null);
-        const res = await fetch("https://nightcap-eta.vercel.app/api/daySummary");
+        const res = await fetch("https://nightcap-eta.vercel.app/api/daySummary", {
+          headers: { "x-client-key": "nightcap-day-summary-2026" },
+        });
         const json = await res.json();
         if (!cancelled) setData(json);
       } catch (e: any) {

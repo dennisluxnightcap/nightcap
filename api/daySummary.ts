@@ -7,12 +7,17 @@
  * - Sends the combined list to Claude, which judges what's actually
  *   significant and writes 2-4 calm sentences, each tagged to the real
  *   source article it's based on
- * - Caches in memory for NEWS_TTL_HOURS (default 6h) so the model is only
+ * - Caches in memory for NEWS_TTL_HOURS (default 24h) so the model is only
  *   called once per window, not on every page load
+ * - This endpoint is public, so a shared client key (not real security,
+ *   just filters out generic bots/scanners) gates whether a request is
+ *   allowed to trigger a fresh, paid Claude call. Unrecognized requests
+ *   just get back whatever's already cached, never force a new fetch.
  */
 import Parser from "rss-parser";
 
-const DEFAULT_TTL_HOURS = 6;
+const DEFAULT_TTL_HOURS = 24;
+const CLIENT_KEY = "nightcap-day-summary-2026";
 
 const rssParser = new Parser({
   customFields: {
@@ -214,6 +219,15 @@ export default async function handler(req, res) {
   if (!ttlExpired && LAST_OK.data) {
     res.setHeader("x-cache", "mem-hit");
     return res.status(200).json(LAST_OK.data);
+  }
+
+  // Cache is stale. Only a request carrying the app's own key is allowed to
+  // trigger a fresh (paid) fetch -- anything else just gets what's cached,
+  // even if stale, so a bot/scanner/monitor hitting this public URL can
+  // never itself force a new Claude call.
+  if (req.headers["x-client-key"] !== CLIENT_KEY) {
+    res.setHeader("x-cache", "stale-unauthorized");
+    return res.status(200).json(LAST_OK.data || { items: [] });
   }
 
   if (!ongoingFetch) {
