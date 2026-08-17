@@ -2,8 +2,9 @@
 // @ts-nocheck
 /**
  * Day Summary — calm, plain-language overview of today's news.
- * - Pulls Guardian (widened past world-only) + BBC World RSS
- * - Dedupes across both sources so they cross-check each other
+ * - Pulls Guardian (widened past world-only) + BBC World RSS + Wikipedia's
+ *   editor-curated Current Events portal (a third, non-newsroom source)
+ * - Dedupes across all three sources so they cross-check each other
  * - Sends the combined list to Claude, which judges what's actually
  *   significant and writes 2-4 calm sentences, each tagged to the real
  *   source article it's based on
@@ -17,6 +18,7 @@
  *   just get back whatever's already cached, never force a new fetch.
  */
 import Parser from "rss-parser";
+import * as cheerio from "cheerio";
 
 const RESET_HOUR_LOCAL = 20; // 8pm
 const MAX_STALENESS_MS = 12 * 60 * 60 * 1000; // 12h floor
@@ -178,6 +180,55 @@ async function fetchBBC() {
   }));
 }
 
+const MONTH_NAMES = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
+];
+
+async function fetchWikipedia() {
+  const now = new Date();
+  const page = `Portal:Current_events/${now.getUTCFullYear()}_${MONTH_NAMES[now.getUTCMonth()]}_${now.getUTCDate()}`;
+
+  const u = new URL("https://en.wikipedia.org/w/api.php");
+  u.searchParams.set("action", "parse");
+  u.searchParams.set("page", page);
+  u.searchParams.set("format", "json");
+  u.searchParams.set("prop", "text");
+  u.searchParams.set("formatversion", "2");
+
+  const r = await fetch(u.toString(), {
+    headers: { "User-Agent": "Nightcap-App/1.0 (personal winddown app; contact via GitHub)" },
+  });
+  if (!r.ok) throw new Error(`Wikipedia returned ${r.status}`);
+  const j = await r.json();
+  if (j.error) throw new Error(`Wikipedia: ${j.error.info || j.error.code}`);
+
+  const $ = cheerio.load(j.parse.text);
+  const results = [];
+
+  $(".current-events-content li").each((_, el) => {
+    const $el = $(el);
+    // Only leaf items -- no nested <ul> of their own -- are actual event
+    // descriptions; everything else is just a topic/subtopic grouping.
+    if ($el.children("ul").length > 0) return;
+
+    const $clone = $el.clone();
+    $clone.find("ul").remove();
+    let text = sanitizeTextForUI($clone.text() || "");
+    text = text.replace(/(\s*\([^()]{1,40}\))+\s*$/, "").trim(); // trailing "(Reuters) (AP)" citations
+    if (!text || text.length < 20) return;
+
+    const href = $el.find("a[href^='/wiki/']").first().attr("href");
+    const url = href
+      ? `https://en.wikipedia.org${href}`
+      : `https://en.wikipedia.org/wiki/${encodeURIComponent(page)}`;
+
+    results.push({ source: "Wikipedia", title: text, url, image: null });
+  });
+
+  return results;
+}
+
 /* ---------- AI write-up ---------- */
 async function writeSummary(articles) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
@@ -185,7 +236,7 @@ async function writeSummary(articles) {
 
   const list = articles.map((a, i) => `${i}. [${a.source}] ${a.title}`).join("\n");
 
-  const prompt = `Here is a list of today's news articles from two independent outlets (Guardian and BBC), across world, culture, science, sport, business, and technology:
+  const prompt = `Here is a list of today's news items from three independent sources -- Guardian and BBC (British newsrooms) and Wikipedia's editor-curated Current Events portal (not a newsroom, globally crowd-curated) -- across world, culture, science, sport, business, and technology:
 
 ${list}
 
@@ -193,11 +244,11 @@ Write a calm, plain-language overview of what actually happened today, for a bed
 
 Rules:
 - 2-4 short, distinct items. Each item is one plain sentence (not headline-style) about a genuinely significant event of the day.
-- Judge significance yourself from the content — don't just repeat whatever is most frequent. A story reported independently by both outlets is A SIGNAL, not proof, of significance — Guardian and BBC are both British outlets, so they will naturally both cover UK-domestic stories (energy bills, cost of living, UK government policy, UK economic data) simply because they share a British audience, not because those stories are globally important. Do not include a UK-domestic policy/economic story just because both outlets ran it. Prioritize events with real global, cross-border, or human-stakes significance (disasters, conflict, major international developments) over domestic British news coverage.
+- Judge significance yourself from the content — don't just repeat whatever is most frequent. Multiple sources independently covering something is A SIGNAL, not proof, of significance — Guardian and BBC are both British outlets, so they will naturally both cover UK-domestic stories (energy bills, cost of living, UK government policy, UK economic data) simply because they share a British audience, not because those stories are globally important. Do not include a UK-domestic policy/economic story just because multiple sources ran it. Prioritize events with real global, cross-border, or human-stakes significance (disasters, conflict, major international developments) over domestic British news coverage.
 - Lead with anything genuinely new. Treat ongoing/continuing situations (a war, a trial, a long-running crisis) as one brief mention rather than dwelling on them.
 - Do NOT force in a positive or "lighter" item if nothing genuinely light happened — only include one if it's actually among the day's real, significant events.
 - For each item, set sourceIndex to the number of the article (from the list above) it's primarily based on.
-- For each item, set keyPhrase to a short phrase (a few words), copied verbatim from that item's own text, that a reader would want to click through to read more about. It must read naturally as part of the sentence.`;
+- Within each item's text, wrap exactly one short phrase (a few words, the part a reader would most want to click through to read more about) in double asterisks, e.g. "A **magnitude-7.7 earthquake** struck..." — it must read as a natural part of the sentence, not a bolted-on tag.`;
 
   const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
@@ -223,9 +274,8 @@ Rules:
                   properties: {
                     text: { type: "string" },
                     sourceIndex: { type: "integer" },
-                    keyPhrase: { type: "string" },
                   },
-                  required: ["text", "sourceIndex", "keyPhrase"],
+                  required: ["text", "sourceIndex"],
                   additionalProperties: false,
                 },
               },
@@ -250,12 +300,13 @@ Rules:
 
 /* ---------- combine + cache ---------- */
 async function buildDaySummary() {
-  const [guardian, bbc] = await Promise.all([
+  const [guardian, bbc, wikipedia] = await Promise.all([
     fetchGuardian().catch(() => []),
     fetchBBC().catch(() => []),
+    fetchWikipedia().catch(() => []),
   ]);
 
-  const combined = dedupe([...guardian, ...bbc]);
+  const combined = dedupe([...guardian, ...bbc, ...wikipedia]);
   if (combined.length === 0) {
     LAST_OK = globalThis._DAYSUMMARY_CACHE = { ts: Date.now(), data: { items: [] } };
     return;
@@ -267,8 +318,13 @@ async function buildDaySummary() {
     .map((it) => {
       const article = combined[it.sourceIndex];
       if (!article) return null;
-      const keyPhrase = it.keyPhrase && it.text?.includes(it.keyPhrase) ? it.keyPhrase : null;
-      return { text: it.text, keyPhrase, sourceUrl: article.url, image: article.image };
+      // Key phrase is marked inline as **phrase** so it's guaranteed to be a
+      // real substring of the text -- no separate field that can drift out
+      // of sync with what was actually written.
+      const match = it.text?.match(/\*\*(.+?)\*\*/);
+      const keyPhrase = match ? match[1] : null;
+      const text = it.text?.replace(/\*\*(.+?)\*\*/, "$1") ?? it.text;
+      return { text, keyPhrase, sourceUrl: article.url, image: article.image };
     })
     .filter(Boolean);
 
