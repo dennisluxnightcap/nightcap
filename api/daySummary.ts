@@ -248,7 +248,7 @@ Rules:
 - Lead with anything genuinely new. Treat ongoing/continuing situations (a war, a trial, a long-running crisis) as one brief mention rather than dwelling on them.
 - Do NOT force in a positive or "lighter" item if nothing genuinely light happened — only include one if it's actually among the day's real, significant events.
 - For each item, set sourceIndex to the number of the article (from the list above) it's primarily based on.
-- Within each item's text, wrap exactly one short phrase (a few words, the part a reader would most want to click through to read more about) in double asterisks, e.g. "A **magnitude-7.7 earthquake** struck..." — it must read as a natural part of the sentence, not a bolted-on tag.`;
+- REQUIRED, for every single item with no exceptions: wrap exactly one short phrase (a few words, the part a reader would most want to click through to read more about) in double asterisks, e.g. "A **magnitude-7.7 earthquake** struck the coast..." or "The **Ebola outbreak** in the DRC has become...". Every item's text must contain exactly one \`**...**\` marked phrase — do not skip this on any item, and do not mark more than one phrase per item.`;
 
   const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
