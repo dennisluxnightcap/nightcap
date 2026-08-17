@@ -334,6 +334,17 @@ async function buildDaySummary() {
 /* ---------- handler ---------- */
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Headers", "x-client-key, x-user-tz, content-type");
+  res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+
+  // Custom headers (x-client-key, x-user-tz) turn this into a "non-simple"
+  // request, so the browser/WebView sends a preflight OPTIONS request first.
+  // Without an explicit reply here, that preflight fails and the real
+  // request never goes out -- curl doesn't hit this at all since CORS is a
+  // browser-only mechanism, which is why it worked in testing but not in-app.
+  if (req.method === "OPTIONS") {
+    return res.status(204).end();
+  }
 
   const userTz = req.headers["x-user-tz"] || "UTC";
   const ttlExpired = isCacheStale(LAST_OK.ts, userTz);
