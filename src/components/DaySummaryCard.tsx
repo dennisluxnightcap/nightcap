@@ -48,7 +48,10 @@ export default function DaySummaryCard() {
       try {
         setErr(null);
         const res = await fetch("https://nightcap-eta.vercel.app/api/daySummary", {
-          headers: { "x-client-key": "nightcap-day-summary-2026" },
+          headers: {
+            "x-client-key": "nightcap-day-summary-2026",
+            "x-user-tz": Intl.DateTimeFormat().resolvedOptions().timeZone,
+          },
         });
         const json = await res.json();
         if (!cancelled) setData(json);

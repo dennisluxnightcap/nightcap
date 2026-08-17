@@ -7,8 +7,10 @@
  * - Sends the combined list to Claude, which judges what's actually
  *   significant and writes 2-4 calm sentences, each tagged to the real
  *   source article it's based on
- * - Caches in memory for NEWS_TTL_HOURS (default 24h) so the model is only
- *   called once per window, not on every page load
+ * - Refreshes once the user has crossed their own local 8pm (evening
+ *   winddown time), using the IANA timezone the client reports via
+ *   x-user-tz, plus a 12h floor so it also updates mid-day if checked
+ *   both morning and evening. Falls back to UTC if no timezone is sent.
  * - This endpoint is public, so a shared client key (not real security,
  *   just filters out generic bots/scanners) gates whether a request is
  *   allowed to trigger a fresh, paid Claude call. Unrecognized requests
@@ -16,8 +18,72 @@
  */
 import Parser from "rss-parser";
 
-const DEFAULT_TTL_HOURS = 24;
+const RESET_HOUR_LOCAL = 20; // 8pm
+const MAX_STALENESS_MS = 12 * 60 * 60 * 1000; // 12h floor
 const CLIENT_KEY = "nightcap-day-summary-2026";
+
+/* ---------- local-midnight-style reset boundary (evening reset, per-user tz) ---------- */
+function getUtcOffsetMinutes(timeZone, date) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    timeZoneName: "shortOffset",
+  }).formatToParts(date);
+  const tzPart = parts.find((p) => p.type === "timeZoneName")?.value || "GMT+0";
+  const match = tzPart.match(/GMT([+-]\d+)(?::(\d+))?/);
+  if (!match) return 0;
+  const hours = parseInt(match[1], 10);
+  const minutes = match[2] ? parseInt(match[2], 10) : 0;
+  return hours * 60 + (hours < 0 ? -minutes : minutes);
+}
+
+function getLocalDateParts(timeZone, date) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    hour12: false,
+  }).formatToParts(date);
+  const get = (type) => parts.find((p) => p.type === type)?.value;
+  const rawHour = get("hour");
+  return {
+    year: Number(get("year")),
+    month: Number(get("month")),
+    day: Number(get("day")),
+    hour: rawHour === "24" ? 0 : Number(rawHour),
+  };
+}
+
+// Most recent past-or-current local RESET_HOUR_LOCAL:00, as a UTC epoch ms.
+function mostRecentResetBoundaryMs(timeZone, now) {
+  const { year, month, day, hour } = getLocalDateParts(timeZone, now);
+  const boundaryDate = new Date(Date.UTC(year, month - 1, day));
+  if (hour < RESET_HOUR_LOCAL) {
+    boundaryDate.setUTCDate(boundaryDate.getUTCDate() - 1);
+  }
+  const offsetMinutes = getUtcOffsetMinutes(timeZone, now);
+  return (
+    Date.UTC(
+      boundaryDate.getUTCFullYear(),
+      boundaryDate.getUTCMonth(),
+      boundaryDate.getUTCDate(),
+      RESET_HOUR_LOCAL,
+      0,
+      0
+    ) -
+    offsetMinutes * 60000
+  );
+}
+
+function isCacheStale(lastFetchedTs, timeZone, now = new Date()) {
+  if (Date.now() - lastFetchedTs > MAX_STALENESS_MS) return true;
+  try {
+    return lastFetchedTs < mostRecentResetBoundaryMs(timeZone, now);
+  } catch {
+    return lastFetchedTs < mostRecentResetBoundaryMs("UTC", now);
+  }
+}
 
 const rssParser = new Parser({
   customFields: {
@@ -213,8 +279,8 @@ async function buildDaySummary() {
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
 
-  const ttlHours = Number(process.env.NEWS_TTL_HOURS) || DEFAULT_TTL_HOURS;
-  const ttlExpired = Date.now() - LAST_OK.ts > ttlHours * 60 * 60 * 1000;
+  const userTz = req.headers["x-user-tz"] || "UTC";
+  const ttlExpired = isCacheStale(LAST_OK.ts, userTz);
 
   if (!ttlExpired && LAST_OK.data) {
     res.setHeader("x-cache", "mem-hit");
