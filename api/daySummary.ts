@@ -8,10 +8,10 @@
  * - Sends the combined list to Claude, which judges what's actually
  *   significant and writes 2-4 calm sentences, each tagged to the real
  *   source article it's based on
- * - Refreshes once the user has crossed their own local 8pm (evening
- *   winddown time), using the IANA timezone the client reports via
- *   x-user-tz, plus a 12h floor so it also updates mid-day if checked
- *   both morning and evening. Falls back to UTC if no timezone is sent.
+ * - Refreshes once, at the user's own local 8pm (evening winddown time) --
+ *   one fixed daily moment, like an evening news broadcast, not a rolling
+ *   window -- using the IANA timezone the client reports via x-user-tz.
+ *   Falls back to UTC if no timezone is sent.
  * - This endpoint is public, so a shared client key (not real security,
  *   just filters out generic bots/scanners) gates whether a request is
  *   allowed to trigger a fresh, paid Claude call. Unrecognized requests
@@ -21,7 +21,6 @@ import Parser from "rss-parser";
 import * as cheerio from "cheerio";
 
 const RESET_HOUR_LOCAL = 20; // 8pm
-const MAX_STALENESS_MS = 12 * 60 * 60 * 1000; // 12h floor
 const CLIENT_KEY = "nightcap-day-summary-2026";
 
 /* ---------- local-midnight-style reset boundary (evening reset, per-user tz) ---------- */
@@ -79,7 +78,11 @@ function mostRecentResetBoundaryMs(timeZone, now) {
 }
 
 function isCacheStale(lastFetchedTs, timeZone, now = new Date()) {
-  if (Date.now() - lastFetchedTs > MAX_STALENESS_MS) return true;
+  // Single fixed daily reset at the user's local evening -- no separate
+  // mid-day floor. A winddown app wants one predictable "tonight's summary
+  // is ready" moment, not updates at odd hours. This still self-corrects
+  // fine if a day (or several) is skipped: it just checks whether the last
+  // fetch predates the most recent 8pm, however long ago that was.
   try {
     return lastFetchedTs < mostRecentResetBoundaryMs(timeZone, now);
   } catch {
