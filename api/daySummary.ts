@@ -193,6 +193,22 @@ async function fetchAlJazeera() {
     }));
 }
 
+async function fetchOgImage(url) {
+  if (!url) return null;
+  try {
+    const r = await fetch(url, {
+      headers: { "User-Agent": "Mozilla/5.0 (compatible; Nightcap-App/1.0)" },
+      signal: AbortSignal.timeout(5000),
+    });
+    if (!r.ok) return null;
+    const html = await r.text();
+    const $ = cheerio.load(html);
+    return $('meta[property="og:image"]').attr("content") || null;
+  } catch {
+    return null;
+  }
+}
+
 const MONTH_NAMES = [
   "January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November", "December",
@@ -327,19 +343,26 @@ async function buildDaySummary() {
 
   const aiItems = await writeSummary(combined);
 
-  const items = aiItems
-    .map((it) => {
-      const article = combined[it.sourceIndex];
-      if (!article) return null;
-      // Key phrase is marked inline as **phrase** so it's guaranteed to be a
-      // real substring of the text -- no separate field that can drift out
-      // of sync with what was actually written.
-      const match = it.text?.match(/\*\*(.+?)\*\*/);
-      const keyPhrase = match ? match[1] : null;
-      const text = it.text?.replace(/\*\*(.+?)\*\*/, "$1") ?? it.text;
-      return { text, keyPhrase, sourceUrl: article.url, image: article.image };
-    })
-    .filter(Boolean);
+  const items = (
+    await Promise.all(
+      aiItems.map(async (it) => {
+        const article = combined[it.sourceIndex];
+        if (!article) return null;
+        // Key phrase is marked inline as **phrase** so it's guaranteed to be a
+        // real substring of the text -- no separate field that can drift out
+        // of sync with what was actually written.
+        const match = it.text?.match(/\*\*(.+?)\*\*/);
+        const keyPhrase = match ? match[1] : null;
+        const text = it.text?.replace(/\*\*(.+?)\*\*/, "$1") ?? it.text;
+        // Al Jazeera's RSS carries no image at all (unlike Guardian), so for
+        // just the handful of items that make the final cut, fall back to
+        // scraping the article page's og:image -- cheap here since it's only
+        // ever a few requests, not run against every candidate article.
+        const image = article.image || (await fetchOgImage(article.url));
+        return { text, keyPhrase, sourceUrl: article.url, image };
+      })
+    )
+  ).filter(Boolean);
 
   LAST_OK = globalThis._DAYSUMMARY_CACHE = { ts: Date.now(), data: { items } };
 }
