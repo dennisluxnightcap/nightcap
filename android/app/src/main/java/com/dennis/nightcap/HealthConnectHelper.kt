@@ -40,18 +40,25 @@ object HealthConnectHelper {
         client.permissionController.getGrantedPermissions().contains(STEPS_PERMISSION)
     }
 
+    // Hour before which "now" is still treated as last night rather than a
+    // new day -- deliberately early (4am), since clock time alone can't
+    // tell "still up from last night" apart from "just woke up"; past 4am
+    // it's overwhelmingly the latter, so a normal morning check still reads
+    // as a fresh day instead of inheriting yesterday's numbers.
+    private const val SEAM_HOUR = 4
+
     /**
      * Start of the current "nightcap day": midnight of today, unless it's
-     * currently before noon, in which case the ritual finishing now started
-     * the PREVIOUS calendar day -- so roll back to yesterday's midnight
-     * instead of resetting to near-zero. Noon is only the cutoff for which
-     * day to roll back to; the window itself always starts at an actual
-     * midnight, so a normal evening check still gets the whole day.
+     * currently before SEAM_HOUR, in which case the ritual finishing now
+     * started the PREVIOUS calendar day -- so roll back to yesterday's
+     * midnight instead of resetting to near-zero. SEAM_HOUR is only the
+     * cutoff for which day to roll back to; the window itself always starts
+     * at an actual midnight, so a normal evening check still gets the whole day.
      */
     private fun nightcapDayStart(zone: ZoneId): Instant {
         val now = ZonedDateTime.now(zone)
         val today = now.toLocalDate()
-        val dayStart = if (now.hour < 12) today.minusDays(1) else today
+        val dayStart = if (now.hour < SEAM_HOUR) today.minusDays(1) else today
         return dayStart.atStartOfDay(zone).toInstant()
     }
 

@@ -184,15 +184,22 @@ public class ScreenTimePlugin extends Plugin {
         call.resolve(result);
     }
 
+    // Hour before which "now" is still treated as last night rather than a
+    // new day -- deliberately early (4am), since clock time alone can't
+    // tell "still up from last night" apart from "just woke up"; past 4am
+    // it's overwhelmingly the latter, so a normal morning check still reads
+    // as a fresh day instead of inheriting yesterday's numbers.
+    private static final int SEAM_HOUR = 4;
+
     // Start of the current "nightcap day": midnight of today, unless it's
-    // currently before noon, in which case the ritual that's finishing now
-    // started the PREVIOUS calendar day -- so roll back to yesterday's
-    // midnight instead of resetting to near-zero. Noon is only the cutoff
-    // for which day we roll back to; the window itself always starts at an
-    // actual midnight, so a normal evening check still gets the whole day.
+    // currently before SEAM_HOUR, in which case the ritual that's finishing
+    // now started the PREVIOUS calendar day -- so roll back to yesterday's
+    // midnight instead of resetting to near-zero. SEAM_HOUR is only the
+    // cutoff for which day we roll back to; the window itself always starts
+    // at an actual midnight, so a normal evening check still gets the whole day.
     private long nightcapDayStart() {
         Calendar cal = Calendar.getInstance();
-        if (cal.get(Calendar.HOUR_OF_DAY) < 12) {
+        if (cal.get(Calendar.HOUR_OF_DAY) < SEAM_HOUR) {
             cal.add(Calendar.DAY_OF_YEAR, -1);
         }
         cal.set(Calendar.HOUR_OF_DAY, 0);
