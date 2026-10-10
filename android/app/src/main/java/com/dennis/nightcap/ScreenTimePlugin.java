@@ -184,17 +184,18 @@ public class ScreenTimePlugin extends Plugin {
         call.resolve(result);
     }
 
-    // Start of the current "nightcap day": the most recent noon at or before
-    // now. Steps/screen time accumulate through the evening and past
-    // midnight, so a calendar-midnight boundary would make a 1am query window
-    // reset to near-zero mid-ritual; anchoring the seam at noon instead keeps
-    // a whole evening-into-early-morning session in one window.
+    // Start of the current "nightcap day": midnight of today, unless it's
+    // currently before noon, in which case the ritual that's finishing now
+    // started the PREVIOUS calendar day -- so roll back to yesterday's
+    // midnight instead of resetting to near-zero. Noon is only the cutoff
+    // for which day we roll back to; the window itself always starts at an
+    // actual midnight, so a normal evening check still gets the whole day.
     private long nightcapDayStart() {
         Calendar cal = Calendar.getInstance();
         if (cal.get(Calendar.HOUR_OF_DAY) < 12) {
             cal.add(Calendar.DAY_OF_YEAR, -1);
         }
-        cal.set(Calendar.HOUR_OF_DAY, 12);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
         cal.set(Calendar.MILLISECOND, 0);

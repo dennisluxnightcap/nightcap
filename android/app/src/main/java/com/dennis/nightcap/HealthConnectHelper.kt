@@ -10,8 +10,8 @@ import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter
 import kotlinx.coroutines.runBlocking
 import java.time.Instant
-import java.time.LocalDate
 import java.time.ZoneId
+import java.time.ZonedDateTime
 
 /**
  * Thin Kotlin wrapper around Health Connect's coroutine-based API so the
@@ -41,20 +41,18 @@ object HealthConnectHelper {
     }
 
     /**
-     * Start of the current "nightcap day": the most recent local noon at or
-     * before now. Steps accumulate through the evening and past midnight, so
-     * a calendar-midnight boundary would make a 1am query window reset to
-     * near-zero mid-ritual; anchoring the seam at noon instead keeps a whole
-     * evening-into-early-morning session in one window.
+     * Start of the current "nightcap day": midnight of today, unless it's
+     * currently before noon, in which case the ritual finishing now started
+     * the PREVIOUS calendar day -- so roll back to yesterday's midnight
+     * instead of resetting to near-zero. Noon is only the cutoff for which
+     * day to roll back to; the window itself always starts at an actual
+     * midnight, so a normal evening check still gets the whole day.
      */
     private fun nightcapDayStart(zone: ZoneId): Instant {
-        val today = LocalDate.now(zone)
-        val noonToday = today.atTime(12, 0).atZone(zone).toInstant()
-        return if (Instant.now().isBefore(noonToday)) {
-            today.minusDays(1).atTime(12, 0).atZone(zone).toInstant()
-        } else {
-            noonToday
-        }
+        val now = ZonedDateTime.now(zone)
+        val today = now.toLocalDate()
+        val dayStart = if (now.hour < 12) today.minusDays(1) else today
+        return dayStart.atStartOfDay(zone).toInstant()
     }
 
     /**
