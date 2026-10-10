@@ -17,23 +17,6 @@ type WikiEvent = {
 };
 
 /* -----------------------
-   Fetch news headlines
-   ----------------------- */
-async function getHeadlines() {
-  try {
-    const res = await fetch("https://nightcap-eta.vercel.app/api/dailyNews?n=5&image=1", {
-      cache: "no-store",
-    });
-    if (!res.ok) throw new Error("Bad response");
-    const data = await res.json();
-    return data.items ?? [];
-  } catch (err) {
-    console.error("News fetch failed:", err);
-    return [];
-  }
-}
-
-/* -----------------------
    Today in History (client-side)
    ----------------------- */
 async function getHistory(): Promise<HistoryEvent[]> {
@@ -73,15 +56,10 @@ async function getHistory(): Promise<HistoryEvent[]> {
    Build the Daily object
    ----------------------- */
 export async function getDaily(d: Date = new Date()): Promise<Daily> {
-  const [articles, history] = await Promise.all([
-    getHeadlines(),
-    getHistory(),
-  ]);
-
+  const history = await getHistory();
   const staticContent = getStaticContent(d);
 
   return {
-    summary: articles,
     history,
     feelGood: staticContent.feelGood,
     learn: staticContent.learn,

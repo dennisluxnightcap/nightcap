@@ -1,5 +1,4 @@
 import React, { useMemo, useState, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import {
   saveMoodForDate,
   getTodayMood,
@@ -7,9 +6,12 @@ import {
   getMoodLogs,
   type MoodValue,
 } from "../utils/moodStore";
+import MoodTrends from "./MoodTrends";
+import TrendAlertBanner from "./TrendAlertBanner";
+import { getMoodTrendAlert, markMoodTrendAlertShown } from "../utils/trendAlert";
 
 /* --- Inline SVG icons --- */
-function Face({ kind, active }: { kind: MoodValue; active: boolean }) {
+export function Face({ kind, active }: { kind: MoodValue; active: boolean }) {
   const color = active ? "rgba(255,77,77,1)" : "rgba(231,236,255,0.4)";
   const glow = active ? "0 0 6px rgba(255,77,77,0.8)" : "none";
 
@@ -118,7 +120,6 @@ export default function MoodSlider({
 }) {
   const initial = getTodayMood()?.mood ?? 3;
   const [value, setValue] = useState<MoodValue>(initial);
-  const [showInsight, setShowInsight] = useState(false);
 
   const glow = useMemo(
     () =>
@@ -130,6 +131,8 @@ export default function MoodSlider({
 
   const yesterdayMood = getYesterdayMood();
   const logs = getMoodLogs();
+  const ascendingLogs = [...logs].sort((a, b) => a.date.localeCompare(b.date));
+  const moodTrend = getMoodTrendAlert(ascendingLogs);
 
   function localISO(d: Date): string {
     const y = d.getFullYear();
@@ -145,37 +148,6 @@ export default function MoodSlider({
     const iso = localISO(d);
     return logs.find((e) => e.date === iso) || null;
   });
-
-  /* --- Reflection generator --- */
-  const generateReflection = (): string | null => {
-    const entries = logs.slice(-3); // last 3 entries regardless of gaps
-    if (entries.length < 3) return null;
-
-    const padded = entries.length < 3
-      ? [...Array(3 - entries.length).fill(entries[0]), ...entries]
-      : entries;
-    const [a, b, c] = padded.map((e: any) => e.mood);
-    const avg = (a + b + c) / 3;
-    const trendUp = c > b && b > a;
-    const trendDown = c < b && b < a;
-    const trendSteady = Math.abs(c - a) <= 1;
-    const trendVolatile = Math.abs(c - a) >= 3 || (c > b && b < a) || (c < b && b > a);
-
-    if (trendUp && c >= 4) return "Each night a little better — you’re heading somewhere good. Keep going.";
-    if (trendUp) return "Things have been picking up — whatever you’re doing, it’s working.";
-    if (trendDown && c <= 2) return "It’s been sliding lately — tonight, just focus on rest. That’s enough.";
-    if (trendDown) return "A few harder days in a row. Rest well tonight and take tomorrow one step at a time.";
-    if (trendVolatile && avg >= 3.5) return "Up and down, but mostly good. Life’s been lively — tonight, let it settle.";
-    if (trendVolatile) return "Your mood’s been all over the place. Consistency here will help — you’re building it.";
-    if (trendSteady && avg >= 4) return "You’ve built something real here — consistent good nights add up more than you think.";
-    if (trendSteady && avg >= 3) return "Steady nights, even if they don’t feel exciting. Your body is finding a rhythm.";
-    if (trendSteady) return "Rough patch, but you keep showing up. Small steps still move you forward.";
-    if (avg <= 2) return "It’s been a hard stretch. Winding down like this is one of the best things you can do — keep coming back.";
-    if (avg >= 4) return "You’ve been in a genuinely good place lately. Keep doing what you’re doing.";
-    return "A mixed few days — that’s just being human. Tonight is yours.";
-  };
-
-  const reflection = generateReflection();
 
   return (
     <section className="mood-section">
@@ -266,6 +238,16 @@ export default function MoodSlider({
           )}
         </div>
 
+        {moodTrend && (
+          <TrendAlertBanner
+            message="You've seemed a little lower the last few days."
+            onShown={() => markMoodTrendAlertShown(moodTrend, ascendingLogs.length)}
+          />
+        )}
+
+        <hr className="mood-trends-divider" />
+        <MoodTrends logs={logs} />
+
       </div>
 
       {/* --- Nav buttons --- */}
@@ -285,7 +267,7 @@ export default function MoodSlider({
 
           <button
             className="nav-btn primary pulse"
-            onClick={() => reflection ? setShowInsight(true) : onNext()}
+            onClick={onNext}
             aria-label="Next"
             title="Next"
           >
@@ -295,40 +277,6 @@ export default function MoodSlider({
           </button>
         </nav>
       </div>
-
-      {/* --- Insight popup --- */}
-      <AnimatePresence>
-        {showInsight && reflection && (
-          <motion.div
-            className="insight-overlay"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1.2, ease: "easeInOut" }}
-          >
-            <motion.div
-              className="insight-card"
-              initial={{ opacity: 0, y: 60 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 40 }}
-              transition={{ duration: 1.0, delay: 0.3, ease: "easeOut" }}
-            >
-              <h3 className="insight-heading">Your week</h3>
-              <hr className="insight-divider" />
-              <p className="insight-text">{reflection}</p>
-              <button
-                className="nav-btn primary pulse"
-                style={{ marginTop: 24, alignSelf: "center" }}
-                onClick={() => { setShowInsight(false); onNext(); }}
-              >
-                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-                  <path d="M8 5l8 7-8 7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </section>
   );
 }

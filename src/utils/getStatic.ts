@@ -177,6 +177,61 @@ const FEELGOOD: Fact[] = [
     sub: "It helps them pick the right leaves for their eggs",
     image: "/images/butterflies.png",
   },
+  {
+    text: "Crows hold 'funerals' — gathering silently around a fallen crow to learn what killed it",
+    sub: "They remember that spot as dangerous for years",
+    image: "/images/crows-funeral.png",
+  },
+  {
+    text: "Dolphins have names for each other — a unique whistle each one creates for itself",
+    sub: "They call out to each other by name across open water",
+    image: "/images/dolphins-names.png",
+  },
+  {
+    text: "Horses remember how you looked at them — and prefer people who smiled, even hours later",
+    sub: "They hold facial expressions in memory like we do",
+    image: "/images/horses-memory.png",
+  },
+  {
+    text: "In Switzerland it's illegal to own just one guinea pig — they get lonely",
+    sub: "The law exists specifically to protect their feelings",
+    image: "/images/guinea-pig.png",
+  },
+  {
+    text: "During WWI, British and German soldiers stopped fighting on Christmas Day and played football in no man's land",
+    sub: "Officers on both sides quietly looked the other way",
+    image: "/images/christmas-truce.png",
+  },
+  {
+    text: "'Mama' sounds similar in almost every language — it's the sound babies naturally make first",
+    sub: "Mothers everywhere got named the same way",
+    image: "/images/mama.png",
+  },
+  {
+    text: "The oldest recorded joke is from ancient Sumer, 1900 BC — and it's a fart joke",
+    sub: "Some things never change",
+    image: "/images/ancient-joke.png",
+  },
+  {
+    text: "Babies laugh about 300 times a day — adults manage around 20",
+    sub: "The capacity never goes anywhere",
+    image: "/images/baby-laugh.png",
+  },
+  {
+    text: "The oldest message in a bottle spent 132 years at sea",
+    sub: "The couple who found it wrote back to the original sender's descendants",
+    image: "/images/message-bottle.png",
+  },
+  {
+    text: "Iceland has no mosquitoes",
+    sub: "The only country in Europe without them",
+    image: "/images/iceland.png",
+  },
+  {
+    text: "In every culture ever studied, people have music — not one society has been found without it",
+    sub: "Some things are just fundamentally human",
+    image: "/images/world-music.png",
+  },
 ];
 
 const LEARN: Fact[] = [
@@ -230,13 +285,86 @@ const LEARN: Fact[] = [
     sub: "The shape comes from ridged intestines, not squeezing",
     image: "/images/wombat.png",
   },
+  {
+    text: "Cleopatra lived closer in time to the Moon landing than to the building of the Great Pyramid",
+    sub: "Ancient history isn't as ancient as we think",
+    image: "/images/cleopatra.png",
+  },
+  {
+    text: "There are more possible games of chess than atoms in the observable universe",
+    sub: "Every game ever played was unique in the history of the universe",
+    image: "/images/chess.png",
+  },
+  {
+    text: "Oxford University is older than the Aztec Empire",
+    sub: "It was already 300 years old when the Aztecs built Tenochtitlan",
+    image: "/images/oxford.png",
+  },
+  {
+    text: "A bolt of lightning is five times hotter than the surface of the sun",
+    sub: "For a fraction of a second, the sky is hotter than a star",
+    image: "/images/lightning2.png",
+  },
+  {
+    text: "Every atom in your body was forged inside a dying star",
+    sub: "You are, quite literally, made of stardust",
+    image: "/images/stardust.png",
+  },
+  {
+    text: "The total weight of all ants on Earth roughly equals the total weight of all humans",
+    sub: "There are about 20 quadrillion of them",
+    image: "/images/ants.png",
+  },
+  {
+    text: "A blue whale's heart beats just twice per minute when diving",
+    sub: "Each beat pumps enough blood to fill a bathtub",
+    image: "/images/blue-whale.png",
+  },
 ];
 
 const BREATHING: Breathing[] = [
-  { pattern: "4-7-8", rounds: 3, script: "Inhale 4, hold 7, exhale 8. Slow and steady." },
-  { pattern: "Box 4-4-4-4", rounds: 4, script: "Inhale 4, hold 4, exhale 4, hold 4 — draw a square with your breath." },
-  { pattern: "5-5", rounds: 5, script: "Inhale 5, exhale 5. Smooth, even rhythm." },
-  { pattern: "6-2-6", rounds: 4, script: "Inhale 6, hold 2, exhale 6." },
+  {
+    pattern: "4-7-8",
+    rounds: 3,
+    script: "Inhale 4, hold 7, exhale 8. Slow and steady.",
+    why: "The long hold and extra-long exhale slow your heart rate before sleep.",
+  },
+  {
+    pattern: "4-4-6",
+    rounds: 4,
+    script: "Inhale 4, hold 4, exhale 6. A longer exhale helps your body relax.",
+    why: "Stretching the exhale past the inhale eases you into a slower rhythm.",
+  },
+  {
+    pattern: "5-5",
+    rounds: 5,
+    script: "Inhale 5, exhale 5. Smooth, even rhythm.",
+    why: "Even, unhurried breathing to keep your heart rate steady.",
+  },
+  {
+    pattern: "6-2-6",
+    rounds: 4,
+    script: "Inhale 6, hold 2, exhale 6.",
+    why: "A brief pause at the top helps your breathing settle into rhythm.",
+  },
+  {
+    pattern: "5-0-8",
+    rounds: 5,
+    script: "Inhale 5, short sniff at the top, exhale 8. Long and slow out.",
+    why: "A short inhale and long exhale ease tension with every breath.",
+  },
+  {
+    pattern: "7-0-11",
+    rounds: 3,
+    script: "Inhale 7, exhale 11. Let the breath all the way out.",
+    why: "An exhale almost double the inhale, for a deeper sense of release.",
+  },
+  {
+    pattern: "7-0-7",
+    rounds: 4,
+    script: "Inhale 7, exhale 7. Deep and unhurried.",
+    why: "Slow, equal breathing to help your body wind down before sleep.",
+  },
 ];
 
 /* -----------------------

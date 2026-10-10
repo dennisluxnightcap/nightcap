@@ -2,8 +2,10 @@
 // @ts-nocheck
 /**
  * Day Summary — calm, plain-language overview of today's news.
- * - Pulls Guardian (widened past world-only) + BBC World RSS + Wikipedia's
- *   editor-curated Current Events portal (a third, non-newsroom source)
+ * - Pulls Guardian (widened past world-only) + Al Jazeera English RSS +
+ *   Wikipedia's editor-curated Current Events portal (a third, non-newsroom
+ *   source). BBC was dropped as a source because its articles are paywalled
+ *   for readers tapping through from the app.
  * - Dedupes across all three sources so they cross-check each other
  * - Sends the combined list to Claude, which judges what's actually
  *   significant and writes 2-4 calm sentences, each tagged to the real
@@ -173,14 +175,22 @@ async function fetchGuardian() {
     }));
 }
 
-async function fetchBBC() {
-  const feed = await rssParser.parseURL("https://feeds.bbci.co.uk/news/world/rss.xml");
-  return (feed.items || []).map((item) => ({
-    source: "BBC",
-    title: sanitizeTextForUI(item.title || ""),
-    url: item.link || "",
-    image: item.enclosure?.url || item.mediaThumbnail?.$?.url || item.mediaContent?.$?.url || null,
-  }));
+async function fetchAlJazeera() {
+  const feed = await rssParser.parseURL("https://www.aljazeera.com/xml/rss/all.xml");
+  return (feed.items || [])
+    // The feed mixes in video/show content and liveblogs alongside real
+    // articles -- same kind of non-article noise Guardian's liveblog filter
+    // below excludes.
+    .filter((item) => {
+      const path = (item.link || "").split("aljazeera.com")[1] || "";
+      return !path.startsWith("/video/") && !path.includes("/liveblog/");
+    })
+    .map((item) => ({
+      source: "Al Jazeera",
+      title: sanitizeTextForUI(item.title || ""),
+      url: item.link || "",
+      image: item.enclosure?.url || item.mediaThumbnail?.$?.url || item.mediaContent?.$?.url || null,
+    }));
 }
 
 const MONTH_NAMES = [
@@ -239,7 +249,7 @@ async function writeSummary(articles) {
 
   const list = articles.map((a, i) => `${i}. [${a.source}] ${a.title}`).join("\n");
 
-  const prompt = `Here is a list of today's news items from three independent sources -- Guardian and BBC (British newsrooms) and Wikipedia's editor-curated Current Events portal (not a newsroom, globally crowd-curated) -- across world, culture, science, sport, business, and technology:
+  const prompt = `Here is a list of today's news items from three independent sources -- Guardian (British newsroom), Al Jazeera (Qatari-funded newsroom), and Wikipedia's editor-curated Current Events portal (not a newsroom, globally crowd-curated) -- across world, culture, science, sport, business, and technology:
 
 ${list}
 
@@ -247,7 +257,7 @@ Write a calm, plain-language overview of what actually happened today, for a bed
 
 Rules:
 - 2-4 short, distinct items. Each item is one plain sentence (not headline-style) about a genuinely significant event of the day.
-- Judge significance yourself from the content — don't just repeat whatever is most frequent. Multiple sources independently covering something is A SIGNAL, not proof, of significance — Guardian and BBC are both British outlets, so they will naturally both cover UK-domestic stories (energy bills, cost of living, UK government policy, UK economic data) simply because they share a British audience, not because those stories are globally important. Do not include a UK-domestic policy/economic story just because multiple sources ran it. Prioritize events with real global, cross-border, or human-stakes significance (disasters, conflict, major international developments) over domestic British news coverage.
+- Judge significance yourself from the content — never from how a story got into this list. Multiple sources covering something is A SIGNAL, not proof, of significance. Watch for each source's own lens: Guardian will naturally cover UK-domestic stories more just because it has a British audience, and a story appearing in its "World" section is not proof of global significance either -- that section files all of Guardian's international coverage, including purely single-country domestic news (a national election, a budget, a policy fight) from anywhere. Al Jazeera is funded by Qatar's government, which shows up specifically in coverage of Israel-Gaza (generally more sympathetic to the Palestinian side) and Gulf regional politics (Qatar's own foreign policy, and its neighbors/rivals) -- weigh its framing on those specific topics the same skeptical way, rather than taking it at face value. Only include a domestic story, from any single country, if it has genuine cross-border, global, or human-stakes weight — not just because it showed up in these feeds. Prioritize events with real global, cross-border, or human-stakes significance (disasters, conflict, major international developments) over domestic news coverage.
 - Lead with anything genuinely new. Treat ongoing/continuing situations (a war, a trial, a long-running crisis) as one brief mention rather than dwelling on them.
 - Do NOT force in a positive or "lighter" item if nothing genuinely light happened — only include one if it's actually among the day's real, significant events.
 - For each item, set sourceIndex to the number of the article (from the list above) it's primarily based on.
@@ -303,13 +313,13 @@ Rules:
 
 /* ---------- combine + cache ---------- */
 async function buildDaySummary() {
-  const [guardian, bbc, wikipedia] = await Promise.all([
+  const [guardian, aljazeera, wikipedia] = await Promise.all([
     fetchGuardian().catch(() => []),
-    fetchBBC().catch(() => []),
+    fetchAlJazeera().catch(() => []),
     fetchWikipedia().catch(() => []),
   ]);
 
-  const combined = dedupe([...guardian, ...bbc, ...wikipedia]);
+  const combined = dedupe([...guardian, ...aljazeera, ...wikipedia]);
   if (combined.length === 0) {
     LAST_OK = globalThis._DAYSUMMARY_CACHE = { ts: Date.now(), data: { items: [] } };
     return;

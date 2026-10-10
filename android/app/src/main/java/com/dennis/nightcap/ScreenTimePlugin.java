@@ -17,11 +17,14 @@ import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @CapacitorPlugin(name = "ScreenTime")
 public class ScreenTimePlugin extends Plugin {
@@ -53,21 +56,25 @@ public class ScreenTimePlugin extends Plugin {
         UsageStatsManager usm = (UsageStatsManager) getContext()
                 .getSystemService(Context.USAGE_STATS_SERVICE);
 
-        Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
-        long startTime = cal.getTimeInMillis();
+        long startTime = nightcapDayStart();
         long endTime = System.currentTimeMillis();
 
         UsageEvents events = usm.queryEvents(startTime, endTime);
         UsageEvents.Event event = new UsageEvents.Event();
 
+        // Packages to exclude from screen time (automotive, system chrome, etc.)
+        Set<String> excludedPackages = new HashSet<>(Arrays.asList(
+            "com.google.android.projection.gearhead",  // Android Auto
+            "com.android.systemui",
+            "com.sec.android.app.launcher",
+            "com.android.launcher3",
+            "com.samsung.android.app.cocktailbarservice",
+            "com.android.settings"
+        ));
+
         // Screen-bounded per-app tracking
         boolean isScreenOn = false;
         long screenOnTime = 0L;
-        long totalScreenTime = 0L;
 
         // Per-app: packageName -> foreground start time (only while screen is on)
         Map<String, Long> appFgStart = new HashMap<>();
@@ -86,8 +93,7 @@ public class ScreenTimePlugin extends Plugin {
                     break;
 
                 case UsageEvents.Event.SCREEN_NON_INTERACTIVE:
-                    if (isScreenOn && screenOnTime > 0) {
-                        totalScreenTime += (ts - screenOnTime);
+                    if (isScreenOn) {
                         // Close all open app sessions
                         for (Map.Entry<String, Long> entry : appFgStart.entrySet()) {
                             long elapsed = ts - entry.getValue();
@@ -116,11 +122,18 @@ public class ScreenTimePlugin extends Plugin {
         }
 
         // If screen is still on, close open sessions up to now
-        if (isScreenOn && screenOnTime > 0) {
-            totalScreenTime += (endTime - screenOnTime);
+        if (isScreenOn) {
             for (Map.Entry<String, Long> entry : appFgStart.entrySet()) {
                 long elapsed = endTime - entry.getValue();
                 appTimeMap.merge(entry.getKey(), elapsed, Long::sum);
+            }
+        }
+
+        // Total = sum of individual app times, excluding automotive/system packages
+        long totalScreenTime = 0L;
+        for (Map.Entry<String, Long> entry : appTimeMap.entrySet()) {
+            if (!excludedPackages.contains(entry.getKey())) {
+                totalScreenTime += entry.getValue();
             }
         }
 
@@ -169,6 +182,23 @@ public class ScreenTimePlugin extends Plugin {
         result.put("totalMs", totalScreenTime);
         result.put("apps", topApps);
         call.resolve(result);
+    }
+
+    // Start of the current "nightcap day": the most recent noon at or before
+    // now. Steps/screen time accumulate through the evening and past
+    // midnight, so a calendar-midnight boundary would make a 1am query window
+    // reset to near-zero mid-ritual; anchoring the seam at noon instead keeps
+    // a whole evening-into-early-morning session in one window.
+    private long nightcapDayStart() {
+        Calendar cal = Calendar.getInstance();
+        if (cal.get(Calendar.HOUR_OF_DAY) < 12) {
+            cal.add(Calendar.DAY_OF_YEAR, -1);
+        }
+        cal.set(Calendar.HOUR_OF_DAY, 12);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTimeInMillis();
     }
 
     private boolean hasUsagePermission() {

@@ -1,16 +1,11 @@
+import { nightcapDateKey } from "./nightcapDay";
+
 export type ScreenTimeLog = {
   date: string; // YYYY-MM-DD
   totalMs: number;
 };
 
 const KEY = "nightcapScreenTime_v1";
-
-function localISO(d: Date = new Date()): string {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
-}
 
 export function getScreenTimeLogs(): ScreenTimeLog[] {
   if (typeof window === "undefined") return [];
@@ -25,7 +20,7 @@ export function getScreenTimeLogs(): ScreenTimeLog[] {
 export function recordScreenTime(totalMs: number, date = new Date()): void {
   if (typeof window === "undefined") return;
   const logs = getScreenTimeLogs();
-  const today = localISO(date);
+  const today = nightcapDateKey(date);
 
   const idx = logs.findIndex((e) => e.date === today);
   const entry: ScreenTimeLog = { date: today, totalMs };
@@ -51,13 +46,13 @@ export function getScreenTimeStreak(logs: ScreenTimeLog[] = getScreenTimeLogs())
   const dates = new Set(logs.map((e) => e.date));
   const cursor = new Date();
 
-  if (!dates.has(localISO(cursor))) {
+  if (!dates.has(nightcapDateKey(cursor))) {
     cursor.setDate(cursor.getDate() - 1);
-    if (!dates.has(localISO(cursor))) return 0;
+    if (!dates.has(nightcapDateKey(cursor))) return 0;
   }
 
   let streak = 0;
-  while (dates.has(localISO(cursor))) {
+  while (dates.has(nightcapDateKey(cursor))) {
     streak++;
     cursor.setDate(cursor.getDate() - 1);
   }

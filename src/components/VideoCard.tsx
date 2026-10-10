@@ -7,10 +7,12 @@ export default function VideoCard({
   video,
   onNext,
   onPrev,
+  hideNav,
 }: {
   video: Video;
   onNext?: () => void;
   onPrev?: () => void;
+  hideNav?: boolean;
 }) {
   return (
     <section className="video-section">
@@ -52,56 +54,58 @@ export default function VideoCard({
       </div>
 
       {/* --- Nav buttons --- */}
-      <div style={{ marginTop: 16 }}>
-        <nav className="nav-buttons" aria-label="Video navigation">
-          {onPrev && (
-            <button
-              className="nav-btn primary"
-              onClick={onPrev}
-              aria-label="Back"
-              title="Back"
-            >
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                aria-hidden
+      {!hideNav && (
+        <div style={{ marginTop: 16 }}>
+          <nav className="nav-buttons" aria-label="Video navigation">
+            {onPrev && (
+              <button
+                className="nav-btn primary"
+                onClick={onPrev}
+                aria-label="Back"
+                title="Back"
               >
-                <path
-                  d="M16 19L8 12l8-7"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-          )}
-          {onNext && (
-            <button
-              className="nav-btn primary pulse"
-              onClick={onNext}
-              aria-label="Next"
-              title="Next"
-            >
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                aria-hidden
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden
+                >
+                  <path
+                    d="M16 19L8 12l8-7"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+            )}
+            {onNext && (
+              <button
+                className="nav-btn primary pulse"
+                onClick={onNext}
+                aria-label="Next"
+                title="Next"
               >
-                <path
-                  d="M8 5l8 7-8 7"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-          )}
-        </nav>
-      </div>
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden
+                >
+                  <path
+                    d="M8 5l8 7-8 7"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+            )}
+          </nav>
+        </div>
+      )}
     </section>
   );
 }

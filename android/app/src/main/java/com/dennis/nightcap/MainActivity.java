@@ -6,6 +6,7 @@ public class MainActivity extends BridgeActivity {
     @Override
     public void onCreate(android.os.Bundle savedInstanceState) {
         registerPlugin(ScreenTimePlugin.class);
+        registerPlugin(StepCountPlugin.class);
         super.onCreate(savedInstanceState);
     }
 }

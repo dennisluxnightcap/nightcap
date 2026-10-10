@@ -52,3 +52,27 @@ export function getYesterdayMood(): MoodLog | undefined {
   const yesterday = localISO(d);
   return getMoodLogs().find((e) => e.date === yesterday);
 }
+
+export function getMoodAverage(logs: MoodLog[]): number {
+  if (!logs.length) return 0;
+  return logs.reduce((sum, e) => sum + e.mood, 0) / logs.length;
+}
+
+/** Consecutive-day check-in streak, ending today (or yesterday if today isn't logged yet). */
+export function getMoodStreak(logs: MoodLog[] = getMoodLogs()): number {
+  if (!logs.length) return 0;
+  const dates = new Set(logs.map((e) => e.date));
+  const cursor = new Date();
+
+  if (!dates.has(localISO(cursor))) {
+    cursor.setDate(cursor.getDate() - 1);
+    if (!dates.has(localISO(cursor))) return 0;
+  }
+
+  let streak = 0;
+  while (dates.has(localISO(cursor))) {
+    streak++;
+    cursor.setDate(cursor.getDate() - 1);
+  }
+  return streak;
+}

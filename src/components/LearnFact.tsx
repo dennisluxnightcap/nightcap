@@ -7,12 +7,14 @@ export default function LearnFact({
   image,
   onNext,
   onPrev,
-}: { 
+  hideNav,
+}: {
   text: string;
   sub?: string; // ✅ added
   image?: string;
-  onNext: () => void;
+  onNext?: () => void;
   onPrev?: () => void;
+  hideNav?: boolean;
 }) {
   return (
     <section className="learn">
@@ -87,54 +89,56 @@ export default function LearnFact({
         </AnimatePresence>
       </div>
 
-      <div style={{ marginTop: 16 }}>
-        <nav className="nav-buttons" aria-label="Card navigation">
-          <button
-            className="nav-btn primary"
-            onClick={onPrev ? onPrev : undefined}
-            aria-label="Back"
-            disabled={!onPrev}
-            title={onPrev ? "Back" : ""}
-          >
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              aria-hidden
+      {!hideNav && (
+        <div style={{ marginTop: 16 }}>
+          <nav className="nav-buttons" aria-label="Card navigation">
+            <button
+              className="nav-btn primary"
+              onClick={onPrev ? onPrev : undefined}
+              aria-label="Back"
+              disabled={!onPrev}
+              title={onPrev ? "Back" : ""}
             >
-              <path
-                d="M16 19L8 12l8-7"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden
+              >
+                <path
+                  d="M16 19L8 12l8-7"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
 
-          <button
-            className="nav-btn primary pulse"
-            onClick={onNext}
-            aria-label="Next"
-            title="Next"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              aria-hidden
+            <button
+              className="nav-btn primary pulse"
+              onClick={onNext}
+              aria-label="Next"
+              title="Next"
             >
-              <path
-                d="M8 5l8 7-8 7"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
-        </nav>
-      </div>
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden
+              >
+                <path
+                  d="M8 5l8 7-8 7"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+          </nav>
+        </div>
+      )}
     </section>
   );
 }

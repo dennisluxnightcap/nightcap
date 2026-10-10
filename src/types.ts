@@ -1,8 +1,9 @@
 // src/types.ts
-export type Breathing = { 
-  pattern: string; 
-  rounds: number; 
+export type Breathing = {
+  pattern: string;
+  rounds: number;
   script?: string;
+  why?: string;
 };
 
 export type SummaryItem = {
@@ -43,8 +44,7 @@ export type HistoryEvent = {
 
 // ✅ Daily structure (now includes history array)
 export type Daily = {
-  summary: (string | SummaryItem)[];
-  history: HistoryEvent[];   // ✅ multiple events
+  history: HistoryEvent[];
   feelGood: Fact;
   learn: Fact;
   story: Fact;

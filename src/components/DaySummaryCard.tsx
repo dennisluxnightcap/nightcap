@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { App } from "@capacitor/app";
 
 type DaySummaryItem = {
   text: string;
@@ -44,7 +45,7 @@ export default function DaySummaryCard() {
   useEffect(() => {
     let cancelled = false;
 
-    (async () => {
+    const fetchSummary = async () => {
       try {
         setErr(null);
         const res = await fetch("https://nightcap-eta.vercel.app/api/daySummary", {
@@ -61,10 +62,19 @@ export default function DaySummaryCard() {
           setData({ items: [] });
         }
       }
-    })();
+    };
+
+    fetchSummary();
+
+    // Backgrounding the app doesn't unmount this component -- Android just
+    // pauses the process, so without this it can sit showing a summary from
+    // days ago. Re-check on resume; the server's own local-8pm cache means
+    // this is a cheap no-op unless the boundary's actually been crossed.
+    const listener = App.addListener("resume", fetchSummary);
 
     return () => {
       cancelled = true;
+      listener.then((l) => l.remove());
     };
   }, []);
 

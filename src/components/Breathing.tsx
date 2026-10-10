@@ -1,23 +1,32 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { motion, useAnimation, AnimatePresence } from "framer-motion";
 import { recordBedtime, getBedtimeHistory } from "../utils/bedtimeTracker";
 import WeatherForecast from "./WeatherForecast";
 import BedtimeHistory from "./BedtimeHistory";
-import ScreenTime, { formatDuration } from "../utils/screenTime";
+import ScreenTime from "../utils/screenTime";
+import { recordScreenTime, getScreenTimeLogs } from "../utils/screenTimeTracker";
+import ScreenTimeHistory from "./ScreenTimeHistory";
+import StepCount from "../utils/stepCount";
+import { recordSteps, getStepLogs } from "../utils/stepTracker";
+import StepHistory from "./StepHistory";
 
 type PatternObj = { inhale: number; hold?: number; exhale: number };
 export type Breathing = {
   pattern: string | PatternObj;
   rounds: number;
   script?: string;
+  why?: string;
 };
 
-export default function Breathing({
-  pattern,
-  rounds = 1,
-  script,
-  onComplete,
-}: Breathing & { onComplete?: () => void }) {
+export type BreathingHandle = {
+  /** Stops the breathing animation immediately and jumps to the Good Night summary. */
+  skip: () => void;
+};
+
+function BreathingImpl(
+  { pattern, rounds = 1, script, why, onComplete }: Breathing & { onComplete?: () => void },
+  ref: React.Ref<BreathingHandle>
+) {
   // Parse breathing pattern
   const parsed = (() => {
     if (typeof pattern === "string") {
@@ -44,9 +53,17 @@ export default function Breathing({
   const [remainingSec, setRemainingSec] = useState<number | null>(null);
   const [bedtimeHistory, setBedtimeHistory] = useState<Date[]>([]);
   const [screenTimeMs, setScreenTimeMs] = useState<number | null>(null);
+  const [screenPermission, setScreenPermission] = useState<boolean | null>(null);
+  const [screenTimeLogs, setScreenTimeLogs] = useState(getScreenTimeLogs());
+  const [stepsToday, setStepsToday] = useState<number | null>(null);
+  const [stepAvailable, setStepAvailable] = useState<boolean | null>(null);
+  const [stepPermission, setStepPermission] = useState<boolean | null>(null);
+  const [stepLogs, setStepLogs] = useState(getStepLogs());
 
   const timerRef = useRef<number | null>(null);
   const phaseEndAtRef = useRef<number>(0);
+  const cancelledRef = useRef(false);
+  const finishedRef = useRef(false);
 
   const clearTimer = () => {
     if (timerRef.current != null) {
@@ -54,6 +71,61 @@ export default function Breathing({
       timerRef.current = null;
     }
   };
+
+  // Shared by the normal end-of-session flow and by skip() — records bedtime,
+  // grabs today's screen time, and reveals the Good Night summary.
+  const finishSession = async () => {
+    if (finishedRef.current) return;
+    finishedRef.current = true;
+
+    recordBedtime();
+    setBedtimeHistory(getBedtimeHistory());
+
+    try {
+      const { granted } = await ScreenTime.hasPermission();
+      setScreenPermission(granted);
+      if (granted) {
+        const result = await ScreenTime.getScreenTime();
+        if (result.totalMs != null) {
+          setScreenTimeMs(result.totalMs);
+          recordScreenTime(result.totalMs);
+          setScreenTimeLogs(getScreenTimeLogs());
+        }
+      }
+    } catch {
+      // silently skip if unavailable
+    }
+
+    try {
+      const { available, granted } = await StepCount.hasPermission();
+      setStepAvailable(available);
+      setStepPermission(granted);
+      if (available && granted) {
+        const result = await StepCount.getTodaySteps();
+        if (result.steps != null) {
+          setStepsToday(result.steps);
+          recordSteps(result.steps);
+          setStepLogs(getStepLogs());
+        }
+      }
+    } catch {
+      // silently skip if unavailable
+    }
+
+    setPhase("done");
+    setRemainingSec(null);
+    onComplete?.();
+  };
+
+  const skip = () => {
+    if (finishedRef.current) return;
+    cancelledRef.current = true;
+    controls.stop();
+    clearTimer();
+    void finishSession();
+  };
+
+  useImperativeHandle(ref, () => ({ skip }));
 
   const startCountdown = (seconds: number) => {
     const endAt = performance.now() + seconds * 1000;
@@ -69,7 +141,8 @@ export default function Breathing({
   };
 
   useEffect(() => {
-    let alive = true;
+    cancelledRef.current = false;
+    finishedRef.current = false;
     const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
     const run = async () => {
@@ -80,7 +153,7 @@ export default function Breathing({
       // delay before first inhale
       await sleep(3000);
 
-      for (let r = 0; r < rounds && alive; r++) {
+      for (let r = 0; r < rounds && !cancelledRef.current; r++) {
         // inhale
         setPhase("inhale");
         startCountdown(parsed.inhale);
@@ -88,12 +161,20 @@ export default function Breathing({
           scale: 1.35,
           ["--glow" as any]: 0.9,
           transition: {
-            type: "tween",
-            duration: Math.max(0.05, parsed.inhale),
-            ease: "easeInOut",
+            default: {
+              type: "tween",
+              duration: Math.max(0.05, parsed.inhale),
+              ease: "easeInOut",
+            },
+            // Glow builds gradually, picking up a little pace toward the top of the inhale.
+            ["--glow" as any]: {
+              type: "tween",
+              duration: Math.max(0.05, parsed.inhale),
+              ease: [0.32, 0, 0.67, 0],
+            },
           },
         });
-        if (!alive) break;
+        if (cancelledRef.current) break;
 
         // hold
         if (parsed.hold > 0.0001) {
@@ -108,7 +189,7 @@ export default function Breathing({
             },
           });
         }
-        if (!alive) break;
+        if (cancelledRef.current) break;
 
         // exhale
         setPhase("exhale");
@@ -117,45 +198,53 @@ export default function Breathing({
           scale: 0.75,
           ["--glow" as any]: 0.18,
           transition: {
-            type: "tween",
-            duration: Math.max(0.05, parsed.exhale),
-            ease: "easeInOut",
+            default: {
+              type: "tween",
+              duration: Math.max(0.05, parsed.exhale),
+              ease: "easeInOut",
+            },
+            // Mirror of the inhale: glow eases away, settling gently near the bottom.
+            ["--glow" as any]: {
+              type: "tween",
+              duration: Math.max(0.05, parsed.exhale),
+              ease: [0.33, 1, 0.68, 1],
+            },
           },
         });
-        if (!alive) break;
+        if (cancelledRef.current) break;
 
         await sleep(140);
       }
 
-      if (!alive) return;
-
-      // record bedtime after session ends
-      recordBedtime();
-      setBedtimeHistory(getBedtimeHistory());
-
-      // fetch screen time for Good Night screen
-      try {
-        const { granted } = await ScreenTime.hasPermission();
-        if (granted) {
-          const result = await ScreenTime.getScreenTime();
-          if (result.totalMs != null) setScreenTimeMs(result.totalMs);
-        }
-      } catch {
-        // silently skip if unavailable
-      }
-
-      setPhase("done");
-      setRemainingSec(null);
-      onComplete?.();
+      if (cancelledRef.current) return;
+      await finishSession();
     };
 
     run();
     return () => {
-      alive = false;
+      cancelledRef.current = true;
       controls.stop();
       clearTimer();
     };
   }, [pattern, rounds]);
+
+  // Re-check screen time permission when user returns from Settings
+  useEffect(() => {
+    if (phase !== "done") return;
+    const handleVisible = async () => {
+      if (document.visibilityState !== "visible") return;
+      try {
+        const { granted } = await ScreenTime.hasPermission();
+        setScreenPermission(granted);
+        if (granted && screenTimeMs == null) {
+          const result = await ScreenTime.getScreenTime();
+          if (result.totalMs != null) setScreenTimeMs(result.totalMs);
+        }
+      } catch {}
+    };
+    document.addEventListener("visibilitychange", handleVisible);
+    return () => document.removeEventListener("visibilitychange", handleVisible);
+  }, [phase, screenTimeMs]);
 
   const labelForPhase = {
     getready: "Get ready…",
@@ -201,6 +290,13 @@ export default function Breathing({
                   <div className="breathing-time">{countdownText}</div>
                 </div>
                 {script ? <p className="breathing-script">{script}</p> : null}
+                {why ? (
+                  <>
+                    <hr className="breathing-why-divider" />
+                    <p className="breathing-why">{why}</p>
+                    <hr className="breathing-why-divider breathing-why-divider--after" />
+                  </>
+                ) : null}
               </div>
             </motion.div>
           ) : (
@@ -218,19 +314,27 @@ export default function Breathing({
               </p>
 
               {/* 📱 Screen Time */}
-              {screenTimeMs != null && (
+              {screenTimeMs != null ? (
+                <ScreenTimeHistory todayMs={screenTimeMs} logs={screenTimeLogs} />
+              ) : screenPermission === false ? (
                 <motion.div
                   className="bedtime-history"
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 1.0, delay: 0.4, ease: "easeOut" }}
                 >
-                  <p className="history-label">Screen time today</p>
-                  <p className="screentime-total" style={{ fontSize: "clamp(28px, 7vw, 40px)", margin: "4px 0 0" }}>
-                    {formatDuration(screenTimeMs)}
+                  <p className="history-label">Screen time</p>
+                  <p className="breathing-script" style={{ margin: "4px 0 10px" }}>
+                    Allow access to see your daily total
                   </p>
+                  <button
+                    className="nav-btn primary"
+                    onClick={() => ScreenTime.requestPermission()}
+                  >
+                    Enable
+                  </button>
                 </motion.div>
-              )}
+              ) : null}
 
               {/* 🌦 Weather Forecast */}
               <WeatherForecast />
@@ -242,6 +346,22 @@ export default function Breathing({
                   <BedtimeHistory />
                 </>
               )}
+
+              {/* 👣 Steps — side info, shown last since it's not the app's focus */}
+              {stepAvailable && (
+                <>
+                  <hr className="insight-divider" />
+                  <StepHistory
+                    steps={stepsToday}
+                    granted={stepPermission}
+                    logs={stepLogs}
+                    onRequestPermission={async () => {
+                      const { granted } = await StepCount.requestPermission();
+                      setStepPermission(granted);
+                    }}
+                  />
+                </>
+              )}
             </motion.div>
           )}
         </AnimatePresence>
@@ -249,3 +369,6 @@ export default function Breathing({
     </section>
   );
 }
+
+const Breathing = forwardRef(BreathingImpl);
+export default Breathing;

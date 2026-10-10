@@ -85,8 +85,8 @@ export default function BrightSpot({
                   src={spot.image}
                   alt={spot.text}
                   className="brightspot-image"
-                  initial={{ scale: 1, y: 0 }}
-                  animate={{ scale: 1.2, y: 40 }}
+                  initial={{ scale: 1 }}
+                  animate={{ scale: 1.2 }}
                   transition={{
                     duration: 30,
                     ease: "linear",
