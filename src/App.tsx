@@ -20,7 +20,6 @@ import { RotateCw } from "lucide-react";
 const steps = [
   "Summary",
   "Facts",
-  "History",
   "VideoStory",
   "Mood",
   "Breathe",
@@ -162,31 +161,28 @@ export default function App() {
             </div>
           )}
 
-          {step === "Facts" && (
-            <CardStack
+          {step === "Facts" && daily.factsCategory === "feelGood" && (
+            <FeelGoodFact
+              text={daily.feelGood.text}
+              sub={daily.feelGood.sub}
+              image={daily.feelGood.image}
               onNext={next}
               onPrev={maybePrev}
-              cards={[
-                <FeelGoodFact
-                  key="feel-good"
-                  text={daily.feelGood.text}
-                  sub={daily.feelGood.sub}
-                  image={daily.feelGood.image}
-                  hideNav
-                />,
-                <LearnFact
-                  key="learn"
-                  text={daily.learn.text}
-                  sub={daily.learn.sub}
-                  image={daily.learn.image}
-                  hideNav
-                />,
-              ]}
             />
           )}
 
-          {step === "History" && (
-            <HistoryCard onNext={next} onPrev={maybePrev} />
+          {step === "Facts" && daily.factsCategory === "learn" && (
+            <LearnFact
+              text={daily.learn.text}
+              sub={daily.learn.sub}
+              image={daily.learn.image}
+              onNext={next}
+              onPrev={maybePrev}
+            />
+          )}
+
+          {step === "Facts" && daily.factsCategory === "history" && (
+            <HistoryCard events={daily.history} onNext={next} onPrev={maybePrev} />
           )}
 
           {step === "VideoStory" && (

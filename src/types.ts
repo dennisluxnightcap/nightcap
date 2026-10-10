@@ -45,6 +45,7 @@ export type HistoryEvent = {
 // ✅ Daily structure (now includes history array)
 export type Daily = {
   history: HistoryEvent[];
+  factsCategory: "feelGood" | "learn" | "history";
   feelGood: Fact;
   learn: Fact;
   story: Fact;

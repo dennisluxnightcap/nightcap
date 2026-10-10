@@ -1,24 +1,24 @@
 import React, { useState, useEffect } from "react";
 import { ScrollText } from "lucide-react";
 import { motion } from "framer-motion";
-
-type HistoryEvent = {
-  year: number | string;
-  text: string;
-  image: string | null;
-  link: string;
-};
+import type { HistoryEvent } from "../types";
 
 export default function HistoryCard({
   onNext,
   onPrev,
+  events: providedEvents,
 }: {
   onNext: () => void;
   onPrev?: () => void;
+  /** Pre-fetched events (e.g. from getDaily). Falls back to fetching its own if omitted. */
+  events?: HistoryEvent[];
 }) {
-  const [events, setEvents] = useState<HistoryEvent[]>([]);
+  const [fetchedEvents, setFetchedEvents] = useState<HistoryEvent[]>([]);
+  const events = providedEvents ?? fetchedEvents;
 
   useEffect(() => {
+    if (providedEvents) return;
+
     async function fetchEvents() {
       try {
         const today = new Date();
@@ -44,14 +44,14 @@ export default function HistoryCard({
             };
           });
 
-        setEvents(events);
+        setFetchedEvents(events);
       } catch (err) {
         console.error("Failed to load history events", err);
       }
     }
 
     fetchEvents();
-  }, []);
+  }, [providedEvents]);
 
   return (
     <section className="history-section">

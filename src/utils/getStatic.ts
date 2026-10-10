@@ -26,7 +26,7 @@ function hashString(str: string): number {
   return Math.abs(hash);
 }
 
-function pickByDate<T>(arr: T[], date: Date = new Date()): T {
+function pickByDate<T>(arr: readonly T[], date: Date = new Date()): T {
   const key = localISO(date);
   const idx = hashString(key) % arr.length;
   return arr[idx];
@@ -63,7 +63,7 @@ function shuffleIndices(len: number): number[] {
  * (SSR / server environment).
  */
 function pickWithDailyRotation<T>(
-  arr: T[],
+  arr: readonly T[],
   storageKey: string,
   date: Date = new Date()
 ): T {
@@ -371,8 +371,17 @@ const BREATHING: Breathing[] = [
    Final export
    ----------------------- */
 
+// Which single card fills the "Facts" slot tonight -- feelGood, learn, and
+// today-in-history all cover the same "here's something interesting"
+// ground, so showing all three back to back felt like homework. Rotating
+// through one per night (same no-repeat-until-exhausted scheme as the fact
+// pools) keeps variety across the week without stacking all three in one
+// sitting.
+const FACTS_CATEGORIES = ["feelGood", "learn", "history"] as const;
+
 export function getStaticContent(date: Date = new Date()) {
   return {
+    factsCategory: pickWithDailyRotation(FACTS_CATEGORIES, "nc_facts_category_rotation", date),
     feelGood: pickWithDailyRotation(FEELGOOD, "nc_feelgood_rotation", date),
     learn: pickWithDailyRotation(LEARN, "nc_learn_rotation", date),
     story: pickWithDailyRotation(stories, "nc_story_rotation", date),

@@ -56,11 +56,15 @@ async function getHistory(): Promise<HistoryEvent[]> {
    Build the Daily object
    ----------------------- */
 export async function getDaily(d: Date = new Date()): Promise<Daily> {
-  const history = await getHistory();
   const staticContent = getStaticContent(d);
+  // Only fetch Wikipedia's "on this day" events when history actually won
+  // tonight's facts-category rotation -- no point paying for a network call
+  // whose result won't be shown.
+  const history = staticContent.factsCategory === "history" ? await getHistory() : [];
 
   return {
     history,
+    factsCategory: staticContent.factsCategory,
     feelGood: staticContent.feelGood,
     learn: staticContent.learn,
     story: staticContent.story,
