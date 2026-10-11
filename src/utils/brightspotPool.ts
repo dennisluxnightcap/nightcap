@@ -108,12 +108,6 @@ export const brightspots = [
     year: 2026,
   },
   {
-    text: "Solar-powered cold storage is boosting African farmers' incomes by 50% while cutting food waste — no grid required",
-    image: "/images/africa-solar.png",
-    source: "Euronews",
-    year: 2026,
-  },
-  {
     text: "Nepal's Supreme Court ruled for marriage equality — the fourth ruling in two decades confirming it's a constitutional right",
     image: "/images/nepal-equality.png",
     source: "Blue Diamond Society / QNews",
