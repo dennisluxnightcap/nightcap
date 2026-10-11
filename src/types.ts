@@ -24,6 +24,11 @@ export type Fact = {
 export type Brightspot = Fact & {
   source?: string;
   year?: number;
+  /** Link to the original article -- makes the source credit clickable,
+   * which matters more here than elsewhere: brightspot images are often
+   * hotlinked from the source site rather than custom-made, so crediting
+   * with a real link back keeps that closer to normal news aggregation. */
+  url?: string;
 };
 
 // ✅ New Video type

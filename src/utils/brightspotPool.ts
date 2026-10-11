@@ -119,4 +119,71 @@ export const brightspots = [
     source: "Blue Diamond Society / QNews",
     year: 2026,
   },
+  {
+    text: "Seychelles' Aldabra atoll is now home to roughly 180,000 giant tortoises — more tortoises than people in the entire country",
+    image:
+      "https://i.guim.co.uk/img/media/44734eef89578d79f13141440454c9abeccc49c1/398_0_2263_1812/master/2263.jpg?width=1200&height=630&quality=85&auto=format&fit=crop",
+    source: "The Guardian",
+    year: 2026,
+    url: "https://www.theguardian.com/environment/2026/oct/08/researchers-find-180000-giant-tortoises-living-on-island-in-seychelles",
+  },
+  {
+    text: "A Saudi solar park is doubling as a breeding sanctuary for 38 endangered sand gazelles, with the herd expected to grow to 600 by 2031",
+    image: "https://www.pv-tech.org/wp-content/uploads/2026/10/Saudi-250MW-solar-site-is-base-for-endangered-species-breeding-programme.jpg",
+    source: "PV Tech",
+    year: 2026,
+    url: "https://www.pv-tech.org/saudi-250mw-solar-pv-site-is-base-for-endangered-species-breeding-programme/",
+  },
+  {
+    text: "Rope bridges strung above an Amazon highway have enabled 15,000 safe wildlife crossings for monkeys and other animals — with zero roadkill recorded",
+    image:
+      "https://i.guim.co.uk/img/media/0098c0b7d63ac08c208a58a25d09e33b94b2d7f4/208_37_1700_1360/master/1700.jpg?width=1200&height=630&quality=85&auto=format&fit=crop",
+    source: "The Guardian",
+    year: 2026,
+    url: "https://www.theguardian.com/environment/2026/oct/09/animals-crossing-simple-solution-roadkill-amazon-brazil-alternatives",
+  },
+  {
+    text: "A new NHS genetic test is cutting children's cancer diagnosis time from six weeks down to just two or three days, sparing some kids invasive treatment",
+    image: "https://static.independent.co.uk/2025/04/15/10/04/FILE-CHILD-SICK-UNWELL.jpeg?trim=0,0,0,0&width=1200&height=800&crop=1200:800",
+    source: "The Independent",
+    year: 2026,
+    url: "https://www.independent.co.uk/news/uk/home-news/nhs-cancer-test-wgs-treatment-b3061971.html",
+  },
+  {
+    text: "Scientists estimate that fully restoring the world's oyster reefs could generate $12 trillion a year in cleaner water, carbon capture, and storm protection",
+    image: "https://scx2.b-cdn.net/gfx/news/hires/2026/oysters-on-a-reef.jpg",
+    source: "Phys.org",
+    year: 2026,
+    url: "https://phys.org/news/2026-10-world-oyster-reefs-trillion-planetary.html",
+  },
+  {
+    text: "Somalia cut cholera deaths by 93% as vaccination campaigns and better sanitation reached high-risk communities",
+    image:
+      "https://somalia.un.org/sites/default/files/styles/large/public/2020-02/cholera_in_somalia.jpg?h=6f0fd8a4&itok=7JbdVidk",
+    source: "United Nations Somalia",
+    year: 2026,
+    url: "https://somalia.un.org/en/34380-ending-cholera-somalia",
+  },
+  {
+    text: "Women in Nigeria's Niger Delta have planted 3 million mangroves, restoring 190 hectares of swamp forest devastated by oil pollution",
+    image:
+      "https://i.guim.co.uk/img/media/9cd3985d5cfff20306d26a4d05a766691c546f5f/297_0_5000_4000/master/5000.jpg?width=1200&height=630&quality=85&auto=format&fit=crop",
+    source: "The Guardian",
+    year: 2026,
+    url: "https://www.theguardian.com/global-development/2026/oct/02/one-green-shoot-at-a-time-the-women-restoring-mangrove-forests-in-the-oil-ravaged-niger-delta",
+  },
+  {
+    text: "After generations of 10km walks for water, a Tanzanian village finally has a borehole of its own, freeing women and children from hours of daily water collection",
+    image: "https://tanzaniainsight.com/wp-content/uploads/2026/10/kisima-pic.jpg",
+    source: "Tanzania Insight",
+    year: 2026,
+    url: "https://tanzaniainsight.com/after-10km-water-treks-community-receives-new-well/",
+  },
+  {
+    text: "India capped trade margins on cancer drugs, a move expected to cut prices by up to 70%",
+    image: "https://resize.indiatvnews.com/en/resize/newbucket/1200_-/2026/10/cancer-medicine-prices-may-drop-70-per-cent-1791470162.jpg",
+    source: "India TV News",
+    year: 2026,
+    url: "https://www.indiatvnews.com/health/cancer-medicine-prices-may-drop-70-per-cent-as-government-plans-trade-margin-cap-2026-10-08-1056467",
+  },
 ];

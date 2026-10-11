@@ -101,7 +101,15 @@ export default function BrightSpot({
 
             {spot.source && (
               <p className="brightspot-source">
-                {spot.source} {spot.year ? `(${spot.year})` : ""}
+                {spot.url ? (
+                  <a href={spot.url} target="_blank" rel="noopener noreferrer">
+                    {spot.source} {spot.year ? `(${spot.year})` : ""}
+                  </a>
+                ) : (
+                  <>
+                    {spot.source} {spot.year ? `(${spot.year})` : ""}
+                  </>
+                )}
               </p>
             )}
           </div>
